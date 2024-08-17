@@ -20,13 +20,13 @@ class RecordedTrack
     private ?float $elevation = null;
 
     #[ORM\Column(nullable: true)]
-    private ?float $average_speed = null;
+    private ?float $averageSpeed = null;
 
     #[ORM\Column(nullable: true)]
-    private ?float $maximum_speed = null;
+    private ?float $maximumSpeed = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $track_type = null;
+    private ?string $trackType = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $weather = null;
@@ -62,36 +62,36 @@ class RecordedTrack
 
     public function getAverageSpeed(): ?float
     {
-        return $this->average_speed;
+        return $this->averageSpeed;
     }
 
-    public function setAverageSpeed(?float $average_speed): static
+    public function setAverageSpeed(?float $averageSpeed): static
     {
-        $this->average_speed = $average_speed;
+        $this->averageSpeed = $averageSpeed;
 
         return $this;
     }
 
     public function getMaximumSpeed(): ?float
     {
-        return $this->maximum_speed;
+        return $this->maximumSpeed;
     }
 
-    public function setMaximumSpeed(?float $maximum_speed): static
+    public function setMaximumSpeed(?float $maximumSpeed): static
     {
-        $this->maximum_speed = $maximum_speed;
+        $this->maximumSpeed = $maximumSpeed;
 
         return $this;
     }
 
     public function getTrackType(): ?string
     {
-        return $this->track_type;
+        return $this->trackType;
     }
 
-    public function setTrackType(?string $track_type): static
+    public function setTrackType(?string $trackType): static
     {
-        $this->track_type = $track_type;
+        $this->trackType = $trackType;
 
         return $this;
     }

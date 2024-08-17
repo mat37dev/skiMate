@@ -15,10 +15,13 @@ class Role
     #[ORM\Column]
     private ?int $id = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $name = null;
+
     /**
      * @var Collection<int, user>
      */
-    #[ORM\OneToMany(targetEntity: user::class, mappedBy: 'role')]
+    #[ORM\OneToMany(targetEntity: user::class, mappedBy: 'role', orphanRemoval: true)]
     private Collection $role;
 
     public function __construct()
@@ -29,6 +32,18 @@ class Role
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**

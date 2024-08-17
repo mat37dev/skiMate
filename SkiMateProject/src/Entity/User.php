@@ -4,10 +4,10 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
-
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-class User
+class User implements PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -26,24 +26,22 @@ class User
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(length: 10)]
-    private ?string $phone_number = null;
+    #[ORM\Column(length: 255)]
+    private ?string $phoneNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $ski_level = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $ski_preference = null;
-
-    #[ORM\ManyToOne(inversedBy: 'role')]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Role $role = null;
+    private ?string $skiPreference = null;
 
     #[ORM\ManyToOne(inversedBy: 'skilevel')]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?SkiLevel $skiLevel = null;
 
     #[ORM\ManyToOne(inversedBy: 'UserStatistic')]
     private ?Statistic $statistic = null;
+
+    #[ORM\ManyToOne(inversedBy: 'role')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Role $role = null;
 
     public function getId(): ?int
     {
@@ -100,36 +98,36 @@ class User
 
     public function getPhoneNumber(): ?string
     {
-        return $this->phone_number;
+        return $this->phoneNumber;
     }
 
-    public function setPhoneNumber(string $phone_number): static
+    public function setPhoneNumber(string $phoneNumber): static
     {
-        $this->phone_number = $phone_number;
-
-        return $this;
-    }
-
-    public function getSkiLevel(): ?string
-    {
-        return $this->ski_level;
-    }
-
-    public function setSkiLevel(?string $ski_level): static
-    {
-        $this->ski_level = $ski_level;
+        $this->phoneNumber = $phoneNumber;
 
         return $this;
     }
 
     public function getSkiPreference(): ?string
     {
-        return $this->ski_preference;
+        return $this->skiPreference;
     }
 
-    public function setSkiPreference(?string $ski_preference): static
+    public function setSkiPreference(?string $skiPreference): static
     {
-        $this->ski_preference = $ski_preference;
+        $this->skiPreference = $skiPreference;
+
+        return $this;
+    }
+
+    public function getStatistic(): ?Statistic
+    {
+        return $this->statistic;
+    }
+
+    public function setStatistic(?Statistic $statistic): static
+    {
+        $this->statistic = $statistic;
 
         return $this;
     }
@@ -146,15 +144,7 @@ class User
         return $this;
     }
 
-    public function getStatistic(): ?Statistic
-    {
-        return $this->statistic;
-    }
 
-    public function setStatistic(?Statistic $statistic): static
-    {
-        $this->statistic = $statistic;
 
-        return $this;
-    }
+
 }

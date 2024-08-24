@@ -6,6 +6,7 @@ use App\Repository\RoleRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use App\Entity\User;
 
 #[ORM\Entity(repositoryClass: RoleRepository::class)]
 class Role
@@ -15,18 +16,18 @@ class Role
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $name = null;
+    #[ORM\Column(length: 255, unique: true)]
+    private ?string $role = null;  // Changed from 'name' to 'role'
 
     /**
-     * @var Collection<int, user>
+     * @var Collection<int, User>
      */
-    #[ORM\OneToMany(targetEntity: user::class, mappedBy: 'role', orphanRemoval: true)]
-    private Collection $role;
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'role', orphanRemoval: true)]
+    private Collection $users;
 
     public function __construct()
     {
-        $this->role = new ArrayCollection();
+        $this->users = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -34,42 +35,41 @@ class Role
         return $this->id;
     }
 
-    public function getName(): ?string
-    {
-        return $this->name;
-    }
-
-    public function setName(string $name): static
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, user>
-     */
-    public function getRole(): Collection
+    public function getRole(): ?string
     {
         return $this->role;
     }
 
-    public function addRole(user $role): static
+    public function setRole(string $role): static
     {
-        if (!$this->role->contains($role)) {
-            $this->role->add($role);
-            $role->setRole($this);
+        $this->role = $role;
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getUsers(): Collection
+    {
+        return $this->users;
+    }
+
+    public function addUser(User $user): static
+    {
+        if (!$this->users->contains($user)) {
+            $this->users->add($user);
+            $user->setRole($this);  // Set this Role as the role for the User
         }
 
         return $this;
     }
 
-    public function removeRole(user $role): static
+    public function removeUser(User $user): static
     {
-        if ($this->role->removeElement($role)) {
-            // set the owning side to null (unless already changed)
-            if ($role->getRole() === $this) {
-                $role->setRole(null);
+        if ($this->users->removeElement($user)) {
+            // Set the owning side to null (unless already changed)
+            if ($user->getRole() === $this) {
+                $user->setRole(null);
             }
         }
 

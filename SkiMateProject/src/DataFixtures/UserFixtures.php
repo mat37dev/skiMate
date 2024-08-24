@@ -23,14 +23,14 @@ class UserFixtures extends Fixture
         $faker = $this->faker = Factory::create('fr_FR');
 
         $roleUser = new Role();
-        $roleUser->setName('ROLE_USER');
+        $roleUser->setRole("ROLE_USER");
         $manager->persist($roleUser);
 
         $roleAdmin = new Role();
-        $roleAdmin->setName('ROLE_ADMIN');
+        $roleAdmin->setRole('ROLE_ADMIN');
         $manager->persist($roleAdmin);
 
-        for($i=0; $i<20; $i++){
+        for($i=0; $i<10; $i++){
         $user = new User();
         $user->setFirstname($faker->firstName());
         $user->setLastname($faker->lastName());

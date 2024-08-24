@@ -4,9 +4,16 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
+
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
+#[UniqueEntity('email')]
+
+
 class User implements PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -15,18 +22,24 @@ class User implements PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
     private ?string $firstname = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Email(message: 'The value {{ value }} is not a valid email.',)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
     private ?string $phoneNumber = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -39,7 +52,7 @@ class User implements PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(inversedBy: 'UserStatistic')]
     private ?Statistic $statistic = null;
 
-    #[ORM\ManyToOne(inversedBy: 'role')]
+    #[ORM\ManyToOne(inversedBy: 'users')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Role $role = null;
 
@@ -143,8 +156,4 @@ class User implements PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
-
-
-
 }

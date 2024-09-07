@@ -13,6 +13,7 @@ class UserFixtures extends Fixture
 {
     private ObjectManager $manager;
     protected $faker;
+
     public function __construct(private UserPasswordHasherInterface $passwordHasher)
     {
     }
@@ -30,12 +31,26 @@ class UserFixtures extends Fixture
         $roleAdmin->setRole('ROLE_ADMIN');
         $manager->persist($roleAdmin);
 
-        for($i=0; $i<10; $i++){
+        for ($i = 0; $i < 10; $i++) {
+            $user = new User();
+            $user->setFirstname($faker->firstName());
+            $user->setLastname($faker->lastName());
+            $user->setEmail($faker->email());
+            $password = $faker->password();
+            $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
+            $user->setPassword($hashedPassword);
+            $user->setPhoneNumber($faker->phoneNumber());
+            $user->setRole($roleUser);
+
+            $manager->persist($user);
+            $manager->flush();
+        }
+
         $user = new User();
-        $user->setFirstname($faker->firstName());
-        $user->setLastname($faker->lastName());
-        $user->setEmail($faker->email());
-        $password = $faker->password();
+        $user->setFirstname("Mathieu");
+        $user->setLastname("Crosnier");
+        $user->setEmail("mathieu.crosnier15@outlook.fr");
+        $password = "1234";
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
         $user->setPhoneNumber($faker->phoneNumber());
@@ -43,6 +58,5 @@ class UserFixtures extends Fixture
 
         $manager->persist($user);
         $manager->flush();
-    }
     }
 }

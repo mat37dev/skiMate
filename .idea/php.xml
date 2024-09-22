@@ -89,11 +89,20 @@
       <path value="$PROJECT_DIR$/SkiMateProject/vendor/doctrine/deprecations" />
       <path value="$PROJECT_DIR$/SkiMateProject/vendor/symfony/translation-contracts" />
       <path value="$PROJECT_DIR$/SkiMateProject/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/nelmio/cors-bundle" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/lcobucci/clock" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/lcobucci/jwt" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/lexik/jwt-authentication-bundle" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.2" />
   <component name="PhpStanOptionsConfiguration">
     <option name="transferred" value="true" />
+  </component>
+  <component name="PhpUnit">
+    <phpunit_settings>
+      <PhpUnitSettings custom_loader_path="$PROJECT_DIR$/SkiMateProject/vendor/autoload.php" />
+    </phpunit_settings>
   </component>
   <component name="PsalmOptionsConfiguration">
     <option name="transferred" value="true" />

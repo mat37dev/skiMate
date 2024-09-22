@@ -4,358 +4,23 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="65e600c4-a8b9-4206-afdc-09ee7713c924" name="Changes" comment="Mise a jour du git ignore">
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+    <list default="true" id="65e600c4-a8b9-4206-afdc-09ee7713c924" name="Changes" comment="Ajout du système de connexion.">
+      <change afterPath="$PROJECT_DIR$/SkiMateDocker/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/SkiMateProject/config/packages/lexik_jwt_authentication.yaml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/php.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/php.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/.env" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/.env" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/composer.json" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/composer.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/SkiMateProject/composer.lock" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/composer.lock" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/composer.lock" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/autoload.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/ClassLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/InstalledVersions.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_classmap.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_files.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_namespaces.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_psr4.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_real.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/autoload_static.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/installed.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/installed.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/composer/platform_check.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/deprecation-contracts/CHANGELOG.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/deprecation-contracts/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/deprecation-contracts/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/deprecation-contracts/composer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/deprecation-contracts/function.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/Ctype.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/bootstrap.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/bootstrap80.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-ctype/composer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/Mbstring.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/Resources/unidata/caseFolding.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/Resources/unidata/lowerCase.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/Resources/unidata/titleCaseRegexp.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/Resources/unidata/upperCase.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/bootstrap.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/bootstrap80.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-mbstring/composer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Php83.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateError.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateInvalidOperationException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateInvalidTimeZoneException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateMalformedIntervalStringException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateMalformedPeriodStringException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateMalformedStringException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateObjectError.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/DateRangeError.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/Override.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/Resources/stubs/SQLite3Exception.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/bootstrap.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/bootstrap81.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/polyfill-php83/composer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/CHANGELOG.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/LocaleAwareInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/Test/TranslatorTest.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/TranslatableInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/TranslatorInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/TranslatorTrait.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/translation-contracts/composer.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Attribute/HasNamedArguments.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/CHANGELOG.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Command/DebugCommand.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraint.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintValidatorFactory.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintValidatorFactoryInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintValidatorInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintViolation.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintViolationInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintViolationList.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ConstraintViolationListInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/AbstractComparison.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/AbstractComparisonValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/All.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/AllValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/AtLeastOneOf.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/AtLeastOneOfValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Bic.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/BicValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Blank.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/BlankValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Callback.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CallbackValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CardScheme.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CardSchemeValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Cascade.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Charset.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CharsetValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Choice.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ChoiceValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Cidr.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CidrValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Collection.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CollectionValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Composite.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Compound.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CompoundValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Count.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CountValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Country.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CountryValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CssColor.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CssColorValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Currency.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/CurrencyValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Date.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/DateTime.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/DateTimeValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/DateValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/DisableAutoMapping.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/DivisibleBy.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/DivisibleByValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Email.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/EmailValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/EnableAutoMapping.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/EqualTo.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/EqualToValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Existence.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Expression.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ExpressionLanguageProvider.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ExpressionSyntax.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ExpressionSyntaxValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ExpressionValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/File.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/FileValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/GreaterThan.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/GreaterThanOrEqual.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/GreaterThanOrEqualValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/GreaterThanValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/GroupSequence.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/GroupSequenceProvider.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Hostname.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/HostnameValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Iban.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IbanValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IdenticalTo.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IdenticalToValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Image.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ImageValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Ip.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IpValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsFalse.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsFalseValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsNull.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsNullValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsTrue.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsTrueValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Isbn.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsbnValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Isin.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IsinValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Issn.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/IssnValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Json.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/JsonValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Language.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LanguageValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Length.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LengthValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LessThan.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LessThanOrEqual.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LessThanOrEqualValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LessThanValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Locale.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LocaleValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Luhn.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/LuhnValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/MacAddress.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/MacAddressValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Negative.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NegativeOrZero.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NoSuspiciousCharacters.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NoSuspiciousCharactersValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotBlank.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotBlankValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotCompromisedPassword.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotCompromisedPasswordValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotEqualTo.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotEqualToValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotIdenticalTo.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotIdenticalToValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotNull.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/NotNullValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Optional.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/PasswordStrength.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/PasswordStrengthValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Positive.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/PositiveOrZero.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Range.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/RangeValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Regex.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/RegexValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Required.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Sequentially.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/SequentiallyValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Time.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/TimeValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Timezone.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/TimezoneValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Traverse.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Type.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/TypeValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Ulid.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/UlidValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Unique.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/UniqueValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Url.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/UrlValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Uuid.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/UuidValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/Valid.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ValidValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/When.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/WhenValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Constraints/ZeroComparisonConstraintTrait.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ContainerConstraintValidatorFactory.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Context/ExecutionContext.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Context/ExecutionContextFactory.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Context/ExecutionContextFactoryInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Context/ExecutionContextInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/DataCollector/ValidatorDataCollector.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/DependencyInjection/AddAutoMappingConfigurationPass.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/DependencyInjection/AddConstraintValidatorsPass.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/DependencyInjection/AddValidatorInitializersPass.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/BadMethodCallException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/ConstraintDefinitionException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/ExceptionInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/GroupDefinitionException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/InvalidArgumentException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/InvalidOptionsException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/LogicException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/MappingException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/MissingOptionsException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/NoSuchMetadataException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/OutOfBoundsException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/RuntimeException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/UnexpectedTypeException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/UnexpectedValueException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/UnsupportedMetadataException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/ValidationFailedException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Exception/ValidatorException.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/GroupProviderInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/GroupSequenceProviderInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/AutoMappingStrategy.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/CascadingStrategy.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/ClassMetadata.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/ClassMetadataInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Factory/BlackHoleMetadataFactory.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Factory/LazyLoadingMetadataFactory.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Factory/MetadataFactoryInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/GenericMetadata.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/GetterMetadata.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/AbstractLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/AttributeLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/AutoMappingTrait.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/FileLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/FilesLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/LoaderChain.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/LoaderInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/PropertyInfoLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/StaticMethodLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/XmlFileLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/XmlFilesLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/YamlFileLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/YamlFilesLoader.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/Loader/schema/dic/constraint-mapping/constraint-mapping-1.0.xsd" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/MemberMetadata.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/MetadataInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/PropertyMetadata.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/PropertyMetadataInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Mapping/TraversalStrategy.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ObjectInitializerInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.af.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.ar.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.az.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.be.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.bg.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.bs.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.ca.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.cs.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.cy.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.da.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.de.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.el.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.en.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.es.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.et.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.eu.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.fa.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.fi.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.fr.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.gl.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.he.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.hr.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.hu.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.hy.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.id.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.it.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.ja.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.lb.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.lt.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.lv.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.mk.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.mn.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.my.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.nb.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.nl.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.nn.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.no.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.pl.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.pt.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.pt_BR.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.ro.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.ru.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.sk.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.sl.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.sq.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.sr_Cyrl.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.sr_Latn.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.sv.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.th.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.tl.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.tr.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.uk.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.ur.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.uz.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.vi.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.zh_CN.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Resources/translations/validators.zh_TW.xlf" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Test/ConstraintValidatorTestCase.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Util/PropertyPath.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Validation.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Validator/ContextualValidatorInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Validator/LazyProperty.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Validator/RecursiveContextualValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Validator/RecursiveValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Validator/TraceableValidator.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Validator/ValidatorInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/ValidatorBuilder.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Violation/ConstraintViolationBuilder.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/Violation/ConstraintViolationBuilderInterface.php" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vendor/symfony/validator/composer.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/config/bundles.php" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/config/bundles.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/config/packages/security.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/config/packages/security.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/migrations/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitattributes" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/src/Controller/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/src/Controller/LoginController.php" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/src/Controller/LoginController.php" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/src/Entity/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/src/Repository/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SkiMateProject/symfony.lock" beforeDir="false" afterPath="$PROJECT_DIR$/SkiMateProject/symfony.lock" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -371,18 +36,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "mat37dev"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;mat37dev&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/mat37dev/skiMate.git",
-    "accountId": "5c1ce060-7ed1-46b3-a6ee-ac6637e419fd"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/mat37dev/skiMate.git&quot;,
+    &quot;accountId&quot;: &quot;5c1ce060-7ed1-46b3-a6ee-ac6637e419fd&quot;
   }
-}]]></component>
+}</component>
   <component name="PhpWorkspaceProjectConfiguration" interpreter_name="C:\php\php.exe">
     <include_path>
       <path value="$PROJECT_DIR$/vendor/symfony/polyfill-php83" />
@@ -462,6 +127,10 @@
       <path value="$PROJECT_DIR$/SkiMateProject/vendor/doctrine/deprecations" />
       <path value="$PROJECT_DIR$/SkiMateProject/vendor/symfony/translation-contracts" />
       <path value="$PROJECT_DIR$/SkiMateProject/vendor/doctrine/lexer" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/nelmio/cors-bundle" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/lcobucci/clock" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/lcobucci/jwt" />
+      <path value="$PROJECT_DIR$/SkiMateProject/vendor/lexik/jwt-authentication-bundle" />
     </include_path>
   </component>
   <component name="ProjectColorInfo">{
@@ -476,7 +145,7 @@
   &quot;keyToString&quot;: {
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/AswanJM/PhpstormProjects/Projet&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/mathi/Documents/cours/SkimateFrontend&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -507,6 +176,16 @@
       <workItem from="1725026912197" duration="910000" />
       <workItem from="1725027850567" duration="35000" />
       <workItem from="1725027897849" duration="488000" />
+      <workItem from="1725028416602" duration="1206000" />
+      <workItem from="1725029648771" duration="786000" />
+      <workItem from="1725264361463" duration="73000" />
+      <workItem from="1725351469757" duration="3361000" />
+      <workItem from="1725363229517" duration="7559000" />
+      <workItem from="1725460128570" duration="104000" />
+      <workItem from="1725607617569" duration="25000" />
+      <workItem from="1726834422586" duration="6993000" />
+      <workItem from="1726997596291" duration="468000" />
+      <workItem from="1726998080187" duration="502000" />
     </task>
     <task id="LOCAL-00001" summary="Mise a jour du git ignore">
       <option name="closed" value="true" />
@@ -516,7 +195,23 @@
       <option name="project" value="LOCAL" />
       <updated>1725028347774</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Mise a jour du git ignore">
+      <option name="closed" value="true" />
+      <created>1725028479598</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1725028479598</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Ajout du système de connexion.">
+      <option name="closed" value="true" />
+      <created>1725460210607</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1725460210607</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -535,6 +230,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Mise a jour du git ignore" />
-    <option name="LAST_COMMIT_MESSAGE" value="Mise a jour du git ignore" />
+    <MESSAGE value="Ajout du système de connexion." />
+    <option name="LAST_COMMIT_MESSAGE" value="Ajout du système de connexion." />
   </component>
 </project>

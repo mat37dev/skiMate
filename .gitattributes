@@ -1,0 +1,13 @@
+# Forcer LF pour tous les fichiers texte
+* text=auto
+
+# Forcer LF uniquement pour certains types de fichiers
+*.php text eol=lf
+*.js text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+
+# Exclure les fichiers binaires de la conversion
+*.png binary
+*.jpg binary
+*.gif binary

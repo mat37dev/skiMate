@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
-use App\Repository\UserRepository;
+use App\Repository\UsersRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class LoginController extends AbstractController
 {
     #[Route('/login', name: 'app_user_login', methods: ['POST'])]
-    public function login(Request $request, UserPasswordHasherInterface $passwordHasher, UserRepository $userRepository, JWTTokenManagerInterface $JWTTokenManager): JsonResponse
+    public function login(Request $request, UserPasswordHasherInterface $passwordHasher, UsersRepository $userRepository, JWTTokenManagerInterface $JWTTokenManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $email = $data['email'];
@@ -46,9 +46,9 @@ class LoginController extends AbstractController
             'token' => $token,
             'message' => 'Connexion Réussie',
             'user' => [
-                'id' => $user->getId(),
+                'uuid' => $user->getUuid(),
                 'email' => $user->getEmail(),
-                'roles' => $user->getRole(),
+                'roles' => $user->getRoles(),
             ]
         ], 200);
 

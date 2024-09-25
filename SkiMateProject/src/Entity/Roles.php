@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\SkiLevelRepository;
+use App\Repository\RolesRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SkiLevelRepository::class)]
-class SkiLevel
+#[ORM\Entity(repositoryClass: RolesRepository::class)]
+class Roles
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -31,5 +31,10 @@ class SkiLevel
         $this->name = $name;
 
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->name; // Retourne le nom du rôle comme chaîne
     }
 }

@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
-use App\Entity\User;
-use App\Repository\RoleRepository;
-use App\Repository\UserRepository;
+
+use App\Entity\Users;
+use App\Repository\RolesRepository;
+use App\Repository\UsersRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Faker\Core\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +19,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UserController extends AbstractController
 {
     public function __construct(
-        private UserRepository $userRepository,
+        private UsersRepository $userRepository,
         private EntityManagerInterface $entityManager,
         private ValidatorInterface $validator
     )
@@ -44,7 +46,7 @@ class UserController extends AbstractController
         return $this->json($userData, 200);
     }
     #[Route('/utilisateur/{id}', name: 'app_user_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function showUser(int $id):JsonResponse
+    public function showUser(Uuid $id):JsonResponse
     {
         $user = $this->userRepository->find($id);
 
@@ -67,12 +69,12 @@ class UserController extends AbstractController
     }
 
     #[Route('/utilisateur/add', name:"app_user_add", methods: ['POST'])]
-    public function addUser(Request $request, RoleRepository $role, UserPasswordHasherInterface $passwordHasher):JsonResponse
+    public function addUser(Request $request, RolesRepository $role, UserPasswordHasherInterface $passwordHasher):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $roleAdmin = $role->findOneBy(['role' => 'ROLE_ADMIN']);
 
-        $user = new User();
+        $user = new Users();
         $user->setFirstname($data['firstname']);
         $user->setLastname($data['lastname']);
         $user->setEmail($data['email']);
@@ -80,7 +82,7 @@ class UserController extends AbstractController
         $hashedPassword = $passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
         $user->setPhoneNumber($data['phoneNumber']);
-        $user->setRole($roleAdmin);
+        $user->addRole($roleAdmin);
 
         $errors = $this->validator->validate($user);
         if(count($errors)>0){
@@ -112,7 +114,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/utilisateur/edit/{id}', name:"app_user_edit", requirements: ['id' => '\d+'], methods: ['PUT'])]
-    public function editUser(Request $request, UserPasswordHasherInterface $passwordHasher, int $id):JsonResponse
+    public function editUser(Request $request, UserPasswordHasherInterface $passwordHasher, Uuid $id):JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $user = $this->userRepository->find($id);
@@ -142,7 +144,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/utilisateur/delete/{id}', name:"app_user_delete", requirements: ['id' => '\d+'], methods: ['DELETE'])]
-    public function deleteUser(int $id):JsonResponse
+    public function deleteUser(Uuid $id):JsonResponse
     {
         $user = $this->userRepository->find($id);
 

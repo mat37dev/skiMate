@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Statistic;
+use App\Entity\Statistics;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Statistic>
+ * @extends ServiceEntityRepository<Statistics>
  */
-class StatisticRepository extends ServiceEntityRepository
+class StatisticsRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Statistic::class);
+        parent::__construct($registry, Statistics::class);
     }
 
     //    /**
-    //     * @return Statistic[] Returns an array of Statistic objects
+    //     * @return Statistics[] Returns an array of Statistics objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class StatisticRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Statistic
+    //    public function findOneBySomeField($value): ?Statistics
     //    {
     //        return $this->createQueryBuilder('s')
     //            ->andWhere('s.exampleField = :val')

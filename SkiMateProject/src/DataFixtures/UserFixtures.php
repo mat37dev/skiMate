@@ -54,7 +54,7 @@ class UserFixtures extends Fixture
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
         $user->setPhoneNumber($faker->phoneNumber());
-        $user->setRole($roleUser);
+        $user->setRole($roleAdmin);
 
         $manager->persist($user);
         $manager->flush();

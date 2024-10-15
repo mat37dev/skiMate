@@ -36,11 +36,9 @@ class UserController extends AbstractController
                 'nom'=>$user->getFirstname(),
                 'prenom'=>$user->getLastname(),
                 'email'=>$user->getEmail(),
-                'roles'=>$user->getRole(),
+                'roles'=>$user->getRoles(),
                 'password'=>$user->getPassword(),
                 'phoneNumber'=>$user->getPhoneNumber(),
-                'skiPreference'=>$user->getSkiPreference(),
-                'statistic'=>$user->getStatistic()
             ];
         }
         return $this->json($userData, 200);

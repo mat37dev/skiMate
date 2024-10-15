@@ -22,8 +22,6 @@ class LoginController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $email = $data['email'];
         $password = $data['password'];
-
-        // Rechercher l'utilisateur par email
         $user = $userRepository->findOneBy(['email' => $email]);
 
         if (!$user) {

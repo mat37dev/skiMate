@@ -51,6 +51,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Statistics $statistics = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $skiPreference = null;
+
     public function __construct()
     {
         $this->roles = new ArrayCollection();
@@ -180,5 +183,17 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function getUserIdentifier(): string
     {
         return $this->email;
+    }
+
+    public function getSkiPreference(): ?string
+    {
+        return $this->skiPreference;
+    }
+
+    public function setSkiPreference(?string $skiPreference): static
+    {
+        $this->skiPreference = $skiPreference;
+
+        return $this;
     }
 }

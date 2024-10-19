@@ -25,7 +25,7 @@ class UserController extends AbstractController
     )
     {
     }
-    #[Route('/utilisateurs', name: 'app_users')]
+    #[Route('/utilisateurs', name: 'app_users', methods: ["GET"])]
     public function listUsers(): JsonResponse
     {
         $users= $this->userRepository->findAll();
@@ -33,12 +33,14 @@ class UserController extends AbstractController
         foreach($users as $user){
             $userData[]=[
                 'id'=>$user->getId(),
-                'nom'=>$user->getFirstname(),
-                'prenom'=>$user->getLastname(),
+                'prenom'=>$user->getFirstname(),
+                'nom'=>$user->getLastname(),
                 'email'=>$user->getEmail(),
                 'roles'=>$user->getRoles(),
                 'password'=>$user->getPassword(),
                 'phoneNumber'=>$user->getPhoneNumber(),
+                'skiPreference'=>$user->getSkiPreference(),
+                'statistic'=>$user->getStatistics()
             ];
         }
         return $this->json($userData, 200);
@@ -61,7 +63,7 @@ class UserController extends AbstractController
             'password' => $user->getPassword(),
             'phoneNumber' => $user->getPhoneNumber(),
             'skiPreference' => $user->getSkiPreference(),
-            'statistic' => $user->getStatistic()
+            'statistic' => $user->getStatistics()
         ];
         return $this->json($userData, 200);
     }

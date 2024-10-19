@@ -9,7 +9,7 @@ use Symfony\Contracts\HttpClient\Exception\ServerExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class CallApiService
+class ResortData
 {
     private HttpClientInterface $client;
 
@@ -18,12 +18,14 @@ class CallApiService
         $this->client = $client;
     }
 
-    public function getCallApi()
+    public function getResortData()
     {
+
         $response = $this->client->request(
             'GET',
             'https://opendata.nicecotedazur.org/data/storage/f/2015-10-20T16%3A01%3A37.952Z/sign-ig-ig-base-localisation-selection.json'
         );
+
         return $response->toArray();
     }
 }

@@ -40,7 +40,7 @@ class UserController extends AbstractController
                 'password'=>$user->getPassword(),
                 'phoneNumber'=>$user->getPhoneNumber(),
                 'skiPreference'=>$user->getSkiPreference(),
-                'statistic'=>$user->getStatistic()
+                'statistic'=>$user->getStatistics()
             ];
         }
         return $this->json($userData, 200);
@@ -63,7 +63,7 @@ class UserController extends AbstractController
             'password' => $user->getPassword(),
             'phoneNumber' => $user->getPhoneNumber(),
             'skiPreference' => $user->getSkiPreference(),
-            'statistic' => $user->getStatistic()
+            'statistic' => $user->getStatistics()
         ];
         return $this->json($userData, 200);
     }

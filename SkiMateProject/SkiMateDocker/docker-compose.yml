@@ -9,7 +9,7 @@ services:
             - MYSQL_ROOT_PASSWORD=skimate-password
 
     php:
-        build: ./DockerfilePHP
+        build: DockerfilePHP
         volumes:
             - ../SkiMateProject:/var/www/html
         ports:

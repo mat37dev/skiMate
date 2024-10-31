@@ -6,16 +6,18 @@ use App\Repository\UsersRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
+#[UniqueEntity(fields: ['email'], message: 'Cette adresse mail est déjà utilisée.')]
 class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\GeneratedValue(strategy: 'UUID')]
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?Uuid $id = null;
@@ -28,8 +30,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
     private ?string $firstname = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
+    #[ORM\Column( length: 255, unique: true)]
+    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
+    #[Assert\Email(message: "L'adresse email n'est pas valide")]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
@@ -42,6 +45,10 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToMany(targetEntity: Roles::class)]
     #[ORM\JoinTable(name: 'user_roles')]
+    #[Assert\Count(
+        min: 1,
+        minMessage: "Vous devez fournir au moins un rôle."
+    )]
     private Collection  $roles;
 
     #[ORM\ManyToOne]

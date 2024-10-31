@@ -24,8 +24,7 @@ class UserController extends AbstractController
     )
     {
     }
-
-    #[Route('/utilisateurs', name: 'app_users')]
+    #[Route('/utilisateurs', name: 'app_users', methods: ["GET"])]
     public function listUsers(): JsonResponse
     {
         $users = $this->userRepository->findAll();
@@ -62,7 +61,7 @@ class UserController extends AbstractController
             'password' => $user->getPassword(),
             'phoneNumber' => $user->getPhoneNumber(),
             'skiPreference' => $user->getSkiPreference(),
-            'statistic' => $user->getStatistic()
+            'statistic' => $user->getStatistics()
         ];
         return $this->json($userData, 200);
     }

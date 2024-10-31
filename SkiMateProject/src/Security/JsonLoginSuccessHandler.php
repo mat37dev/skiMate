@@ -2,6 +2,7 @@
 
 namespace App\Security;
 
+use App\Repository\UsersRepository;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -10,6 +11,7 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationSuccessHandlerI
 
 class JsonLoginSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
+
     private JWTTokenManagerInterface $jwtManager;
     public function __construct(JWTTokenManagerInterface $jwtManager)
     {

@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-
 use App\Entity\Users;
 use App\Repository\RolesRepository;
 use App\Repository\UsersRepository;
@@ -19,36 +18,38 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UserController extends AbstractController
 {
     public function __construct(
-        private UsersRepository $userRepository,
+        private UsersRepository        $userRepository,
         private EntityManagerInterface $entityManager,
-        private ValidatorInterface $validator
+        private ValidatorInterface     $validator
     )
     {
     }
+
     #[Route('/utilisateurs', name: 'app_users')]
     public function listUsers(): JsonResponse
     {
-        $users= $this->userRepository->findAll();
+        $users = $this->userRepository->findAll();
         $userData = [];
-        foreach($users as $user){
-            $userData[]=[
-                'id'=>$user->getId(),
-                'nom'=>$user->getFirstname(),
-                'prenom'=>$user->getLastname(),
-                'email'=>$user->getEmail(),
-                'roles'=>$user->getRoles(),
-                'password'=>$user->getPassword(),
-                'phoneNumber'=>$user->getPhoneNumber(),
+        foreach ($users as $user) {
+            $userData[] = [
+                'id' => $user->getId(),
+                'nom' => $user->getFirstname(),
+                'prenom' => $user->getLastname(),
+                'email' => $user->getEmail(),
+                'roles' => $user->getRoles(),
+                'password' => $user->getPassword(),
+                'phoneNumber' => $user->getPhoneNumber(),
             ];
         }
         return $this->json($userData, 200);
     }
+
     #[Route('/utilisateur/{id}', name: 'app_user_show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function showUser(Uuid $id):JsonResponse
+    public function showUser(Uuid $id): JsonResponse
     {
         $user = $this->userRepository->find($id);
 
-        if (!$user){
+        if (!$user) {
             throw $this->createNotFoundException('user not found');
         }
 
@@ -66,8 +67,8 @@ class UserController extends AbstractController
         return $this->json($userData, 200);
     }
 
-    #[Route('/utilisateur/add', name:"app_user_add", methods: ['POST'])]
-    public function addUser(Request $request, RolesRepository $role, UserPasswordHasherInterface $passwordHasher):JsonResponse
+    #[Route('/utilisateur/add', name: "app_user_add", methods: ['POST'])]
+    public function addUser(Request $request, RolesRepository $role, UserPasswordHasherInterface $passwordHasher): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         $roleAdmin = $role->findOneBy(['role' => 'ROLE_ADMIN']);
@@ -83,12 +84,12 @@ class UserController extends AbstractController
         $user->addRole($roleAdmin);
 
         $errors = $this->validator->validate($user);
-        if(count($errors)>0){
-            $errorsMessages=[];
-            foreach($errors as $error){
-                $errorsMessages[]=[
+        if (count($errors) > 0) {
+            $errorsMessages = [];
+            foreach ($errors as $error) {
+                $errorsMessages[] = [
                     'field' => $error->getPropertyPath(),
-                    'message'=>$error->getMessage(),
+                    'message' => $error->getMessage(),
                 ];
             }
             return $this->json([
@@ -100,57 +101,29 @@ class UserController extends AbstractController
         $this->entityManager->flush();
 
         return $this->json([
-            'id'=>$user->getId(),
-            'prenom'=>$user->getFirstname(),
-            'nom'=>$user->getLastname(),
-            'email'=>$user->getEmail(),
-            'password'=>$user->getPassword(),
-            'phoneNumber'=>$user->getPhoneNumber(),
-            'message'=> 'user successfully added',
+            'id' => $user->getId(),
+            'prenom' => $user->getFirstname(),
+            'nom' => $user->getLastname(),
+            'email' => $user->getEmail(),
+            'password' => $user->getPassword(),
+            'phoneNumber' => $user->getPhoneNumber(),
+            'message' => 'user successfully added',
 
         ], 200);
     }
 
-    #[Route('/utilisateur/edit/{id}', name:"app_user_edit", requirements: ['id' => '\d+'], methods: ['PUT'])]
-    public function editUser(Request $request, UserPasswordHasherInterface $passwordHasher, Uuid $id):JsonResponse
-    {
-        $data = json_decode($request->getContent(), true);
-        $user = $this->userRepository->find($id);
 
-        if (!$user){
-            throw $this->createNotFoundException('user not found');
-        };
-        $user->setFirstname($data['firstname']);
-        $user->setLastname($data['lastname']);
-        $user->setEmail($data['email']);
-        $password = $data['password'];
-        $hashedPassword = $passwordHasher->hashPassword($user, $password);
-        $user->setPassword($hashedPassword);
-        $user->setPhoneNumber($data['phoneNumber']);
 
-        $this->entityManager->persist($user);
-        $this->entityManager->flush();
-
-        return $this->json([
-            'id'=>$user->getId(),
-            'prenom'=>$user->getFirstname(),
-            'nom'=>$user->getLastname(),
-            'email'=>$user->getEmail(),
-            'password'=>$user->getPassword(),
-            'phoneNumber'=>$user->getPhoneNumber(),
-        ], 200);
-    }
-
-    #[Route('/utilisateur/delete/{id}', name:"app_user_delete", requirements: ['id' => '\d+'], methods: ['DELETE'])]
-    public function deleteUser(Uuid $id):JsonResponse
+    #[Route('/utilisateur/delete/{id}', name: "app_user_delete", requirements: ['id' => '\d+'], methods: ['DELETE'])]
+    public function deleteUser(Uuid $id): JsonResponse
     {
         $user = $this->userRepository->find($id);
 
-        if (!$user){
+        if (!$user) {
             throw $this->createNotFoundException('user not found');
         }
-            $this->entityManager->remove($user);
-            $this->entityManager->flush();
+        $this->entityManager->remove($user);
+        $this->entityManager->flush();
 
         return $this->json([
             'user deleted'

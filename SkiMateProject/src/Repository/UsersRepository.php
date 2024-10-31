@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -11,12 +12,23 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class UsersRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityManagerInterface $entityManager;
+
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $manager, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Users::class);
+        $this->entityManager = $entityManager;
     }
 
-    //    /**
+    public function save(Users $user): void
+    {
+        $this->entityManager->persist($user);
+        $this->entityManager->flush();
+    }
+
+
+
+        //    /**
     //     * @return Users[] Returns an array of Users objects
     //     */
     //    public function findByExampleField($value): array

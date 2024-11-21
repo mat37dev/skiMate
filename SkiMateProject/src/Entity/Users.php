@@ -61,6 +61,9 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $skiPreference = null;
 
+    #[ORM\ManyToOne]
+    private ?SkiResort $skiResort = null;
+
     public function __construct()
     {
         $this->roles = new ArrayCollection();
@@ -203,4 +206,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getSkiResort(): ?SkiResort
+    {
+        return $this->skiResort;
+    }
+
+    public function setSkiResort(?SkiResort $skiResort): static
+    {
+        $this->skiResort = $skiResort;
+
+        return $this;
+    }
+
+
 }

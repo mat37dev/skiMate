@@ -9,7 +9,6 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UsersRepository::class)]
@@ -17,10 +16,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class Users implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'UUID')]
-    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\Column(type: 'string',length: 36, unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
-    private ?Uuid $id = null;
+    private ?string $id = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
@@ -54,12 +53,11 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne]
     private ?SkiLevel $skiLevel = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Statistics $statistics = null;
-
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $skiPreference = null;
+
+    #[ORM\ManyToOne]
+    private ?SkiResort $skiResort = null;
 
     public function __construct()
     {
@@ -67,7 +65,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
 
-    public function getId(): ?Uuid
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -170,18 +168,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getStatistics(): ?Statistics
-    {
-        return $this->statistics;
-    }
-
-    public function setStatistics(Statistics $statistics): static
-    {
-        $this->statistics = $statistics;
-
-        return $this;
-    }
-
     public function eraseCredentials(): void
     {
         // TODO: Implement eraseCredentials() method.
@@ -203,4 +189,18 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function getSkiResort(): ?SkiResort
+    {
+        return $this->skiResort;
+    }
+
+    public function setSkiResort(?SkiResort $skiResort): static
+    {
+        $this->skiResort = $skiResort;
+
+        return $this;
+    }
+
+
 }

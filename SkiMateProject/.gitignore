@@ -1,18 +1,39 @@
-
-###> symfony/framework-bundle ###
+# Environnement et configurations locales
+/.env
 /.env.local
-/.env.local.php
 /.env.*.local
+/.env.local.php
+
+# Clés de déchiffrement et secrets en production
 /config/secrets/prod/prod.decrypt.private.php
-/public/bundles/
-/var/
+/config/jwt/*.pem
+
+# Cache, logs, et autres fichiers temporaires
 /var/cache/
 /var/log/
+/var/sessions/
+/var/backups/
+/var/test/
+/public/bundles/
+
+# Fichiers générés par Composer et les vendor
 /vendor/
 
-###< symfony/framework-bundle ###
-
-###> lexik/jwt-authentication-bundle ###
-/config/jwt/*.pem
-###< lexik/jwt-authentication-bundle ###
+# Migration et autres fichiers générés
 /migrations/
+
+# IDE / éditeurs
+/.idea/
+/.vscode/
+/*.iml
+
+# Fichiers de build spécifiques à Docker (si utilisés)
+docker-compose.override.yml
+/docker/
+
+# Fichiers compilés spécifiques à Java
+*.class
+*.jar
+*.war
+*.ear
+

@@ -34,10 +34,13 @@ class ProfileController extends AbstractController
         }
         $sessions = $this->sessionRepository->findSessionsByUser($user);
 
+        $userSerialize = json_decode($serializer->serialize($user, 'json'), true);
+        unset($userSerialize['password']);
         $userData = [
-            "user" =>json_decode($serializer->serialize($user, 'json')),
-            "sessions" => json_decode($serializer->serialize($sessions, 'json'))
+            "user" => $userSerialize,
+            "sessions" => json_decode($serializer->serialize($sessions, 'json'),true)
         ];
+
 
         return new JsonResponse($userData);
     }

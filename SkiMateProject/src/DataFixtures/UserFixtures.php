@@ -5,8 +5,10 @@ namespace App\DataFixtures;
 
 use App\Entity\Roles;
 
+use App\Entity\Session;
 use App\Entity\Statistics;
 use App\Entity\Users;
+use App\Repository\UsersRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
@@ -16,9 +18,10 @@ class UserFixtures extends Fixture
 {
     private ObjectManager $manager;
     protected $faker;
-
-    public function __construct(private UserPasswordHasherInterface $passwordHasher)
+    private  UsersRepository $usersRepository;
+    public function __construct(private UserPasswordHasherInterface $passwordHasher, UsersRepository $usersRepository)
     {
+        $this->usersRepository = $usersRepository;
     }
 
     public function load(ObjectManager $manager): void
@@ -44,11 +47,12 @@ class UserFixtures extends Fixture
             $user->setPassword($hashedPassword);
             $user->setPhoneNumber($faker->phoneNumber());
             $user->addRole($roleUser);
-            $user->setStatistics(new Statistics());
+
 
             $manager->persist($user);
             $manager->flush();
         }
+
 
         $user = new Users();
         $user->setFirstname("Mathieu");
@@ -58,10 +62,21 @@ class UserFixtures extends Fixture
         $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
         $user->setPassword($hashedPassword);
         $user->setPhoneNumber($faker->phoneNumber());
-        $user->addRole($roleUser);
-        $user->setStatistics(new Statistics());
 
         $manager->persist($user);
+
+
+        $session1 = new Session();
+        $session2 = new Session();
+        $session1->setUser($user);
+        $session2->setUser($user);
+        $session1->setDistance(50);
+        $session2->setDistance(100);
+        $session1->setDuree(50);
+        $session2->setDuree(100);
+        $manager->persist($session1);
+        $manager->persist($session2);
+
         $manager->flush();
     }
 }

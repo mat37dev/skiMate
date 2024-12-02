@@ -6,7 +6,6 @@ namespace App\DataFixtures;
 use App\Entity\Roles;
 
 use App\Entity\Session;
-use App\Entity\Statistics;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -16,18 +15,13 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class UserFixtures extends Fixture
 {
-    private ObjectManager $manager;
-    protected $faker;
-    private  UsersRepository $usersRepository;
-    public function __construct(private UserPasswordHasherInterface $passwordHasher, UsersRepository $usersRepository)
+    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, UsersRepository $usersRepository)
     {
-        $this->usersRepository = $usersRepository;
     }
 
     public function load(ObjectManager $manager): void
     {
-        $this->manager = $manager;
-        $faker = $this->faker = Factory::create('fr_FR');
+        $faker = Factory::create('fr_FR');
 
         $roleUser = new Roles();
         $roleUser->setName("ROLE_USER");
@@ -69,12 +63,16 @@ class UserFixtures extends Fixture
 
         $session1 = new Session();
         $session2 = new Session();
+        $now = new \DateTime();
         $session1->setUser($user);
         $session2->setUser($user);
         $session1->setDistance(50);
         $session2->setDistance(100);
         $session1->setDuree(50);
         $session2->setDuree(100);
+        $session1->setDate($now);
+        $session2->setDate($now);
+
         $manager->persist($session1);
         $manager->persist($session2);
 

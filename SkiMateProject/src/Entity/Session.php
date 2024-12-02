@@ -14,16 +14,24 @@ class Session
     #[ORM\Column]
     private ?int $id = null;
 
+    /*
+     * La distance est stockée en mètre.
+     */
     #[ORM\Column]
     private ?float $distance = null;
 
-    //La durée est stockée en minute
+    /*
+     * La durée est stockée en minute.
+     */
     #[ORM\Column]
     private ?int $duree = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Users $user = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $date = null;
 
     public function getId(): ?int
     {
@@ -65,4 +73,18 @@ class Session
 
         return $this;
     }
+
+    public function getDate(): ?\DateTimeInterface
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeInterface $date): static
+    {
+        $this->date = $date;
+
+        return $this;
+    }
+
+
 }

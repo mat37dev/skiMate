@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Entity\Session;
 use App\Repository\SessionRepository;
 use App\Repository\UsersRepository;
+
+use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
@@ -43,5 +47,28 @@ class ProfileController extends AbstractController
 
 
         return new JsonResponse($userData);
+    }
+
+    #[Route('/new/', name: 'app_add_profile', methods: ['POST'])]
+    public function addProfile(Request $request, ObjectManager $manager): JsonResponse
+    {
+        $user = $this->userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        if (!$user) {
+            return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
+        }
+        $data = json_decode($request->getContent(), true);
+        $duree = $data['duree'];
+        $distance = $data['distance'];
+        $date = $data['date'];
+        $session = new Session();
+        $session->setUser($user);
+        $session->setDuree($duree);
+        $session->setDistance($distance);
+        $session->setDate($date);
+
+        $manager->persist($session);
+        $manager->flush();
+
+        return new JsonResponse(['message' => 'Opération réussie'], Response::HTTP_OK);
     }
 }

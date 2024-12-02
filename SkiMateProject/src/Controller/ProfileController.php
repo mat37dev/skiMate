@@ -8,6 +8,7 @@ use App\Entity\Session;
 use App\Repository\SessionRepository;
 use App\Repository\UsersRepository;
 
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -50,8 +51,8 @@ class ProfileController extends AbstractController
         return new JsonResponse($userData);
     }
 
-    #[Route('/new', name: 'app_add_profile', methods: ['POST'])]
-    public function addProfile(Request $request, SessionRepository $sessionRepository, ValidatorInterface $validator): JsonResponse
+    #[Route('/session/new', name: 'app_add_session_profile', methods: ['POST'])]
+    public function addSession(Request $request, SessionRepository $sessionRepository, ValidatorInterface $validator): JsonResponse
     {
         $user = $this->userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
         if (!$user) {
@@ -88,5 +89,24 @@ class ProfileController extends AbstractController
 
         $sessionRepository->save($session);
         return new JsonResponse(['message' => 'Opération réussie'], Response::HTTP_CREATED);
+    }
+
+    #[Route('/session/delete', name: 'app_delete_session_profile', methods: ['POST'])]
+    public function deleteSession(Request $request, SessionRepository $sessionsRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['sessionId'])) {
+            return new JsonResponse(['message' => 'ID de session manquant'], Response::HTTP_BAD_REQUEST);
+        }
+        $sessionId = $data['sessionId'];
+        // Trouver la session par son ID
+        $session = $sessionsRepository->find($sessionId);
+        if (!$session) {
+            return new JsonResponse(['message' => 'Session non trouvée'], Response::HTTP_NOT_FOUND);
+        }
+        // Supprimer la session
+        $entityManager->remove($session);
+        $entityManager->flush();
+        return new JsonResponse(['message' => 'Session supprimée avec succès'], Response::HTTP_OK);
     }
 }

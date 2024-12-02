@@ -23,7 +23,7 @@ class SessionRepository extends ServiceEntityRepository
     public function findSessionsByUser(Users $user): array
     {
         $qb = $this->createQueryBuilder('session')
-            ->select('session.duree, session.distance, session.date') // Sélectionner uniquement les champs duree et distance
+            ->select('session.id, session.duree, session.distance, session.date') // Sélectionner uniquement les champs duree et distance
             ->andWhere('session.user = :user')
             ->setParameter('user', $user);
 

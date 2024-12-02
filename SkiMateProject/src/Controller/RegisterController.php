@@ -1,7 +1,7 @@
 <?php
 namespace App\Controller;
 
-use App\Entity\Statistics;
+
 use App\Entity\Users;
 use App\Repository\RolesRepository;
 use App\Repository\UsersRepository;
@@ -30,7 +30,6 @@ class RegisterController extends AbstractController
                 $data['password']
             ));
         $user->setPhoneNumber($data['phoneNumber']);
-        $user->setStatistics(new Statistics());
         $user->addRole($rolesRepository->findOneBy(['name' => 'ROLE_USER']));
         $errors = $validator->validate($user);
         if (count($errors) > 0) {

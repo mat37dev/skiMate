@@ -53,7 +53,6 @@ class AdminController extends AbstractController
                 $data['password']
             ));
         $user->setPhoneNumber($data['phoneNumber']);
-        $user->setStatistics(new Statistics());
         $user->addRole($rolesRepository->findOneBy(['name' => $data['roles']]));
         $errors = $validator->validate($user);
         if (count($errors) > 0) {

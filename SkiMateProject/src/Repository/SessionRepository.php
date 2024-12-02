@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Session;
 use App\Entity\Users;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -12,19 +13,27 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class SessionRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityManagerInterface $entityManager;
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Session::class);
+        $this->entityManager = $entityManager;
     }
 
     public function findSessionsByUser(Users $user): array
     {
         $qb = $this->createQueryBuilder('session')
-            ->select('session.duree, session.distance') // Sélectionner uniquement les champs duree et distance
+            ->select('session.id, session.duree, session.distance, session.date') // Sélectionner uniquement les champs duree et distance
             ->andWhere('session.user = :user')
             ->setParameter('user', $user);
 
         return $qb->getQuery()->getArrayResult(); // Retourner les résultats sous forme de tableau
+    }
+
+    public function save(Session $session): void
+    {
+        $this->entityManager->persist($session);
+        $this->entityManager->flush();
     }
 
 

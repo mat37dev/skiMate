@@ -14,7 +14,7 @@ class UsersRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $entityManager;
 
-    public function __construct(ManagerRegistry $registry, EntityManagerInterface $manager, EntityManagerInterface $entityManager)
+    public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
         parent::__construct($registry, Users::class);
         $this->entityManager = $entityManager;

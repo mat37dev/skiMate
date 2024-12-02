@@ -15,6 +15,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 #[Route('/api/profile')]
@@ -42,33 +43,50 @@ class ProfileController extends AbstractController
         unset($userSerialize['password']);
         $userData = [
             "user" => $userSerialize,
-            "sessions" => json_decode($serializer->serialize($sessions, 'json'),true)
+            "sessions" => json_decode($serializer->serialize($sessions, 'json'), true)
         ];
 
 
         return new JsonResponse($userData);
     }
 
-    #[Route('/new/', name: 'app_add_profile', methods: ['POST'])]
-    public function addProfile(Request $request, ObjectManager $manager): JsonResponse
+    #[Route('/new', name: 'app_add_profile', methods: ['POST'])]
+    public function addProfile(Request $request, SessionRepository $sessionRepository, ValidatorInterface $validator): JsonResponse
     {
         $user = $this->userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
+
         $data = json_decode($request->getContent(), true);
-        $duree = $data['duree'];
-        $distance = $data['distance'];
-        $date = $data['date'];
+        if (!isset($data['duree'], $data['distance'], $data['date'])) {
+            return new JsonResponse(['message' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $duree = filter_var($data['duree'], FILTER_VALIDATE_INT);
+        $distance = filter_var($data['distance'], FILTER_VALIDATE_FLOAT);
+        $date = \DateTime::createFromFormat('Y-m-d H:i:s', $data['date']);
+        if ($duree === false || $distance === false || !$date) {
+            return new JsonResponse(['message' => 'Données invalides'], Response::HTTP_BAD_REQUEST);
+        }
+
+
         $session = new Session();
         $session->setUser($user);
         $session->setDuree($duree);
         $session->setDistance($distance);
         $session->setDate($date);
 
-        $manager->persist($session);
-        $manager->flush();
+        $errors = $validator->validate($session);
+        if (count($errors) > 0) {
+            $errorsList = [];
+            foreach ($errors as $error) {
+                $errorsList[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorsList], Response::HTTP_BAD_REQUEST);
+        }
 
-        return new JsonResponse(['message' => 'Opération réussie'], Response::HTTP_OK);
+        $sessionRepository->save($session);
+        return new JsonResponse(['message' => 'Opération réussie'], Response::HTTP_CREATED);
     }
 }

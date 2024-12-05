@@ -38,10 +38,13 @@ security:
             provider: app_user_provider
             jwt: ~
             entry_point: App\Security\ApiAuthenticationEntryPoint
+            refresh_jwt:
+                check_path: /api/token/refresh
 
     access_control:
         - { path: ^/api/login$, roles: PUBLIC_ACCESS }
         - { path: ^/api/register$, roles: PUBLIC_ACCESS }
+        - { path: ^/api/token/refresh$, roles: PUBLIC_ACCESS }
         - { path: ^/api/admin/utilisateur, roles: ROLE_USER }
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
 

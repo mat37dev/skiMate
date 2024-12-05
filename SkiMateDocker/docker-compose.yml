@@ -29,3 +29,13 @@ services:
             - MYSQL_PASSWORD=skimate
         ports:
             - "3306:3306"
+
+    mongo:
+        image: mongo
+        restart: always
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: skimate
+            MONGO_INITDB_ROOT_PASSWORD: skimate
+
+volumes:
+    mysql_data:

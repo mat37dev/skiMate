@@ -99,12 +99,11 @@ class ProfileController extends AbstractController
             return new JsonResponse(['message' => 'ID de session manquant'], Response::HTTP_BAD_REQUEST);
         }
         $sessionId = $data['sessionId'];
-        // Trouver la session par son ID
         $session = $sessionsRepository->find($sessionId);
         if (!$session) {
             return new JsonResponse(['message' => 'Session non trouvée'], Response::HTTP_NOT_FOUND);
         }
-        // Supprimer la session
+
         $entityManager->remove($session);
         $entityManager->flush();
         return new JsonResponse(['message' => 'Session supprimée avec succès'], Response::HTTP_OK);

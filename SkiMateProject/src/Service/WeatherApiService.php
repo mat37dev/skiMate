@@ -2,16 +2,59 @@
 
 namespace App\Service;
 
+use App\Document\WeatherForecast;
+use App\Entity\SkiResort;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Exception;
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WeatherApiService
 {
     private HttpClientInterface $httpClient;
+    private DocumentManager $documentManager;
+    private LoggerInterface $logger;
 
-    public function __construct(HttpClientInterface $httpClient)
+    public function __construct(HttpClientInterface $httpClient, DocumentManager $documentManager, LoggerInterface $logger)
     {
         $this->httpClient = $httpClient;
+        $this->documentManager = $documentManager;
+        $this->logger = $logger;
+    }
+
+    public function saveWeeklyWeatherForAllLocations(): void
+    {
+        // Récupérer toutes les stations (avec coordonnées) depuis la base de données
+        //Attention, il faudra récupérer toutes les stations et mettre le try dans une boucle!
+
+        //Données de test
+        $location = 'La Plagne';
+        $location = strtolower($location);
+        try {
+            // Appeler la méthode pour chaque station
+            $this->saveWeeklyWeather('45.5057', '6.6803', $location);
+        } catch (\Exception $e) {
+            // Log en cas d'échec pour une station spécifique
+            $this->logger->error("Échec de la mise à jour pour la station $location : {$e->getMessage()}");
+        }
+    }
+
+    public function saveWeeklyWeather(float $latitude, float $longitude, string $location): void
+    {
+        $data = $this->getWeeklyWeather($latitude, $longitude);
+
+        $existingData = $this->documentManager->getRepository(WeatherForecast::class)->findOneBy(['location' => $location]);
+        if ($existingData) {
+            $this->documentManager->remove($existingData);
+        }
+        $meteo = new WeatherForecast();
+        $meteo->setLocation($location)
+            ->setDate(new \DateTime())
+            ->setForecasts($data);
+
+        // Persister dans MongoDB
+        $this->documentManager->persist($meteo);
+        $this->documentManager->flush();
     }
 
     public function getWeeklyWeather(float $latitude, float $longitude): array

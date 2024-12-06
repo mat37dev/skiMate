@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Document\Snowfall;
 use App\Document\WeatherForecast;
 use App\Entity\SkiResort;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -30,8 +31,8 @@ class WeatherApiService
         //Données de test
         $location = 'La Plagne';
         $location = strtolower($location);
+        // Appeler la méthode pour chaque station
         try {
-            // Appeler la méthode pour chaque station
             $this->saveWeeklyWeather('45.5057', '6.6803', $location);
         } catch (\Exception $e) {
             // Log en cas d'échec pour une station spécifique
@@ -52,9 +53,33 @@ class WeatherApiService
             ->setDate(new \DateTime())
             ->setForecasts($data);
 
-        // Persister dans MongoDB
         $this->documentManager->persist($meteo);
         $this->documentManager->flush();
+
+        // Chercher les prévisions pour aujourd'hui pour mettre à jour les dernières tombées de neiges
+        $today = (new \DateTime())->format('Y-m-d');
+        $todayForecast = array_filter($data, function ($forecast) use ($today) {
+            return isset($forecast['day']) && $forecast['day'] === $today;
+        });
+
+        if (!empty($todayForecast)) {
+            $todayForecast = reset($todayForecast);
+
+            $morningSnowfall = $todayForecast['morning']['snowfall'] ?? 0;
+            $afternoonSnowfall = $todayForecast['afternoon']['snowfall'] ?? 0;
+
+            $totalSnowfall = $morningSnowfall + $afternoonSnowfall;
+
+            if ($totalSnowfall > 0) {
+                $this->updateLastSnowfall($location, [
+                    'snowfall' => $totalSnowfall,
+                ]);
+            } else {
+                $this->logger->info("Aucune chute de neige aujourd'hui pour $location.");
+            }
+        } else {
+            $this->logger->info("Aucune prévision trouvée pour aujourd'hui pour $location.");
+        }
     }
 
     public function getWeeklyWeather(float $latitude, float $longitude): array
@@ -218,7 +243,37 @@ class WeatherApiService
             99 => ['Orage avec grêle forte', 'pluvieux'],
             default => ['Inconnu', 'inconnu'],
         };
-
-
     }
+
+    public function updateLastSnowfall(string $location, array $dailyWeatherData): void
+    {
+        // Recherche de la station
+        $snowfallRepository = $this->documentManager->getRepository(Snowfall::class);
+        $snowfall = $snowfallRepository->findOneBy(['location' => $location]);
+
+        // Vérifier si une chute de neige est prévue aujourd'hui
+        $today = new \DateTime();
+        $todaySnowfall = $dailyWeatherData['snowfall']; // Exemple : données de chute de neige pour aujourd'hui (en cm)
+
+        if ($todaySnowfall > 0) {
+            if (!$snowfall) {
+                // Si la station n'existe pas encore, la créer
+                $snowfall = new Snowfall();
+                $snowfall->setLocation($location);
+            }
+
+            // Mise à jour de la dernière chute de neige
+            $snowfall->setLastSnowfallDate($today)
+                ->setSnowfallAmount($todaySnowfall);
+
+            $this->documentManager->persist($snowfall);
+            $this->logger->info("Dernière chute de neige mise à jour pour $location : $todaySnowfall cm");
+        } else {
+            $this->logger->info("Pas de chute de neige aujourd'hui pour $location.");
+        }
+
+        // Sauvegarder les changements dans MongoDB
+        $this->documentManager->flush();
+    }
+
 }

@@ -19,7 +19,13 @@ class RegisterController extends AbstractController
     #[Route('/register', name: 'api_register', methods: ['POST'])]
     public function index(Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator, UsersRepository $usersRepository, RolesRepository $rolesRepository): JsonResponse
     {
+
         $data = json_decode($request->getContent(), true);
+
+        if($data["password"] !== $data["confirmPassword"]){
+            return new JsonResponse(['errors'=>'les mots de passe ne correspondent pas'], Response::HTTP_BAD_REQUEST);
+        }
+
         $user = new Users();
         $user->setEmail($data['email']);
         $user->setFirstName($data['firstName']);

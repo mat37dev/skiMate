@@ -60,7 +60,6 @@ class UserFixtures extends Fixture
 
         $manager->persist($user);
 
-
         $session1 = new Session();
         $session2 = new Session();
         $now = new \DateTime();

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use App\Document\Snowfall;
 use App\Document\WeatherForecast;
 use App\Service\WeatherApiService;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -24,19 +25,29 @@ class WeatherController extends AbstractController
         if (!$location) {
             return $this->json(['error' => 'La location est requise.'], 400);
         }
-        // Rechercher les données météo dans la base de données pour la location
-        $weatherData = $documentManager->getRepository(WeatherForecast::class)->findOneBy(['location' => strtolower($location)]);
+
+        $normalizedLocation = strtolower($location);
+
+        // Rechercher les données météo pour la location
+        $weatherData = $documentManager->getRepository(WeatherForecast::class)->findOneBy(['location' => $normalizedLocation]);
 
         if (!$weatherData) {
             return $this->json(['error' => "Aucune donnée météo trouvée pour la location $location."], 404);
         }
 
-        // Retourner les prévisions
+        $forecast = $weatherData->getForecasts();
+
+        // Rechercher les informations sur les dernières chutes de neige pour la location
+        $lastSnowfallData = $documentManager->getRepository(Snowfall::class)->findOneBy(['location' => $normalizedLocation]);
+        $forecast['0']['lastSnowfall'] = $lastSnowfallData ? $lastSnowfallData->getSnowfallAmount(): null;
+        $forecast['0']['lastSnowFallDate'] = $lastSnowfallData ? $lastSnowfallData->getLastSnowfallDate(): null;
+
+        // Construire la réponse
         return $this->json([
             'location' => $weatherData->getLocation(),
             'date' => $weatherData->getDate(),
-            'forecasts' => $weatherData->getForecasts(),
+            'forecasts' => $forecast
         ]);
     }
-
 }
+

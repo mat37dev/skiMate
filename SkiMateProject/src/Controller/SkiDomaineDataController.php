@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Document\Station;
 use App\Service\SkiDomainDataFetcher;
 use App\Service\SkiDomainDataTransformer;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -13,7 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api')]
 class SkiDomaineDataController extends AbstractController
 {
-    #[Route('/domaine-data', name: 'app_domaine_data', methods: ['POST'])]
+    #[Route('/admin/domaine-data', name: 'app_admin_domaine_data', methods: ['POST'])]
     public function index(
         Request $request,
         SkiDomainDataFetcher $domainDataFetcher,
@@ -41,7 +43,7 @@ class SkiDomaineDataController extends AbstractController
                     $station = $transformer->transformStation($domainName, $stationElement, $stationsData);
 
                     // Vérifier si cette station existe déjà (par exemple, via osmId)
-                    $existingStation = $documentManager->getRepository(\App\Document\Station::class)
+                    $existingStation = $documentManager->getRepository(Station::class)
                         ->findOneBy(['osmId' => $station->getOsmId()]);
 
                     if ($existingStation) {
@@ -75,5 +77,63 @@ class SkiDomaineDataController extends AbstractController
             'stations_importées' => $imported,
             'last_features_data' => $featuresData
         ]);
+    }
+
+
+    #[Route('/get-ski-domain', name: 'app_get_ski_domain', methods: ['POST'])]
+    public function getSkiDomain(Request $request, DocumentManager $documentManager): JsonResponse
+    {
+        $requestData = json_decode($request->getContent(), true);
+        $domain = $requestData['domaine'] ?? null;
+
+        if (!$domain) {
+            return $this->json(['error' => 'Le champ "domaine" est requis.'], 400);
+        }
+
+        // Récupérer toutes les stations pour ce domaine
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $stations = $stationRepository->findBy(['domain' => $domain]);
+
+        $features = [];
+
+        foreach ($stations as $station) {
+            // Ajouter un Feature pour la station
+            $features[] = [
+                'type' => 'Feature',
+                'geometry' => $station->getGeometry(),
+                'properties' => [
+                    'type' => 'station',
+                    'name' => $station->getName(),
+                    'osmId' => $station->getOsmId(),
+                    'tags' => $station->getTags(),
+                    'validated' => $station->isValidated()
+                ]
+            ];
+
+            // Ajouter un Feature pour chaque item de la station
+            foreach ($station->getItems() as $item) {
+                $features[] = [
+                    'type' => 'Feature',
+                    'geometry' => $item['geometry'],
+                    'properties' => array_merge(
+                        [
+                            'type' => $item['properties']['category'] ?? 'unknown',
+                            'source' => $item['properties']['source'] ?? 'osm',
+                            'validated' => $item['validated'] ?? false
+                        ],
+                        // On fusionne les tags pour avoir direct les infos
+                        // Sinon on peut juste 'tags' => $item['properties']['tags']
+                        ['tags' => $item['properties']['tags'] ?? []]
+                    )
+                ];
+            }
+        }
+
+        $geoJson = [
+            'type' => 'FeatureCollection',
+            'features' => $features,
+        ];
+
+        return new JsonResponse($geoJson);
     }
 }

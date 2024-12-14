@@ -49,7 +49,7 @@ class Station
     //   "validated": false
     // }
     #[ODM\Field(type: "collection")]
-    private array $items = [];
+    private $features = [];
 
     public function getId(): ?string
     {
@@ -122,20 +122,14 @@ class Station
         return $this;
     }
 
-    public function getItems(): array
+    public function getFeatures(): array
     {
-        return $this->items;
+        return $this->features;
     }
 
-    public function setItems(array $items): self
+    public function setFeatures(array $features): self
     {
-        $this->items = $items;
-        return $this;
-    }
-
-    public function addItem(array $item): self
-    {
-        $this->items[] = $item;
+        $this->features = $features;
         return $this;
     }
 }

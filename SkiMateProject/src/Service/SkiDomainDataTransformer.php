@@ -24,19 +24,22 @@ class SkiDomainDataTransformer
         return $station;
     }
 
-    public function transformAllItems(array $featuresData): array
+    /**
+     * Transforme les données des features récupérées en véritables features GeoJSON.
+     */
+    public function transformAllFeatures(array $featuresData): array
     {
-        $items = [];
+        $features = [];
         foreach ($featuresData['elements'] as $element) {
-            $item = $this->transformItem($element, $featuresData);
-            if ($item !== null) {
-                $items[] = $item;
+            $feature = $this->transformFeature($element, $featuresData);
+            if ($feature !== null) {
+                $features[] = $feature;
             }
         }
-        return $items;
+        return $features;
     }
 
-    private function transformItem(array $element, array $data): ?array
+    private function transformFeature(array $element, array $data): ?array
     {
         $tags = $element['tags'] ?? [];
         $category = $this->determineCategory($tags);
@@ -47,13 +50,14 @@ class SkiDomainDataTransformer
         $geometry = $this->extractGeometry($element, $data);
 
         return [
-            "type" => "Item",
+            "type" => "Feature",
             "geometry" => $geometry,
             "properties" => [
                 "source" => "osm",
                 "category" => $category,
                 "tags" => $tags
             ],
+            // Si vous voulez conserver l'information "validated":
             "validated" => false
         ];
     }
@@ -64,7 +68,7 @@ class SkiDomainDataTransformer
             return 'piste';
         }
         if (isset($tags['aerialway'])) {
-            return 'lift';
+            return 'lift'; // note: vous pouvez appeler ça 'remontee' si besoin
         }
         if (isset($tags['amenity'])) {
             if ($tags['amenity'] === 'restaurant') return 'restaurant';
@@ -83,7 +87,7 @@ class SkiDomainDataTransformer
         $nodes = $wayElement['nodes'] ?? [];
         $coords = [];
 
-        // Indexer tous les node par leur id
+        // Indexer tous les nodes par leur id
         $nodesById = [];
         foreach ($data['elements'] as $el) {
             if ($el['type'] === 'node') {

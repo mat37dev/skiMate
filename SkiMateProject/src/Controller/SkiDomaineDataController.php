@@ -42,28 +42,27 @@ class SkiDomaineDataController extends AbstractController
                     // Transformer la station
                     $station = $transformer->transformStation($domainName, $stationElement, $stationsData);
 
-                    // Vérifier si cette station existe déjà (par exemple, via osmId)
+                    // Vérifier si cette station existe déjà
                     $existingStation = $documentManager->getRepository(Station::class)
                         ->findOneBy(['osmId' => $station->getOsmId()]);
 
                     if ($existingStation) {
-                        // Supprimer l'ancienne version
                         $documentManager->remove($existingStation);
                         $documentManager->flush();
                     }
 
-                    // Persister la station "vide" (sans items)
+                    // Persister la station "vide"
                     $documentManager->persist($station);
                     $documentManager->flush();
 
                     // Récupérer les features pour cette station
                     $featuresData = $domainDataFetcher->fetchFeaturesForStation($wayId);
 
-                    // Transformer les features en items
-                    $items = $transformer->transformAllItems($featuresData);
-                    $station->setItems($items);
+                    // Transformer les features en Features GeoJSON
+                    $features = $transformer->transformAllFeatures($featuresData);
+                    $station->setFeatures($features);
 
-                    // Mettre à jour la station avec ses items
+                    // Mettre à jour la station avec ses features
                     $documentManager->persist($station);
                     $documentManager->flush();
 
@@ -72,10 +71,15 @@ class SkiDomaineDataController extends AbstractController
             }
         }
 
+        $featureCollection = [
+            "type" => "FeatureCollection",
+            "features" => $features ?? []
+        ];
+
         return $this->json([
             'message' => 'Import terminé',
             'stations_importées' => $imported,
-            'last_features_data' => $featuresData
+            'last_features_data' => $featureCollection
         ]);
     }
 
@@ -97,7 +101,7 @@ class SkiDomaineDataController extends AbstractController
         $features = [];
 
         foreach ($stations as $station) {
-            // Ajouter un Feature pour la station
+            // Ajouter un Feature pour la station (sa géométrie de type Polygon)
             $features[] = [
                 'type' => 'Feature',
                 'geometry' => $station->getGeometry(),
@@ -110,22 +114,12 @@ class SkiDomaineDataController extends AbstractController
                 ]
             ];
 
-            // Ajouter un Feature pour chaque item de la station
-            foreach ($station->getItems() as $item) {
-                $features[] = [
-                    'type' => 'Feature',
-                    'geometry' => $item['geometry'],
-                    'properties' => array_merge(
-                        [
-                            'type' => $item['properties']['category'] ?? 'unknown',
-                            'source' => $item['properties']['source'] ?? 'osm',
-                            'validated' => $item['validated'] ?? false
-                        ],
-                        // On fusionne les tags pour avoir direct les infos
-                        // Sinon on peut juste 'tags' => $item['properties']['tags']
-                        ['tags' => $item['properties']['tags'] ?? []]
-                    )
-                ];
+            // Ajouter les Features propres à la station (pistes, lifts, etc.)
+            // Désormais, $station->getFeatures() retourne des Features déjà conformes à GeoJSON
+            foreach ($station->getFeatures() as $feature) {
+                // $feature doit déjà être un tableau avec keys 'type', 'geometry', 'properties'.
+                // Si c'est déjà formaté correctement, on peut l'ajouter directement :
+                $features[] = $feature;
             }
         }
 

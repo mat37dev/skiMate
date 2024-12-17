@@ -6,6 +6,8 @@ namespace App\Controller;
 
 use App\Entity\Session;
 use App\Repository\SessionRepository;
+use App\Repository\SkiLevelRepository;
+use App\Repository\SkiPreferenceRepository;
 use App\Repository\UsersRepository;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -107,5 +109,20 @@ class ProfileController extends AbstractController
         $entityManager->remove($session);
         $entityManager->flush();
         return new JsonResponse(['message' => 'Session supprimée avec succès'], Response::HTTP_OK);
+    }
+
+    #[Route('/ski-level-list', name: 'app_ski_level_list', methods: ['GET'])]
+    public function getSkiLevel(SkiLevelRepository $skiLevelRepository): JsonResponse
+    {
+        $skiLevelList = $skiLevelRepository->findAll();
+        return $this->json($skiLevelList);
+    }
+
+
+    #[Route('/ski-preference-list', name: 'app_ski_preference_list', methods: ['GET'])]
+    public function getSkiPreference(SkiPreferenceRepository $skiPreferenceRepository): JsonResponse
+    {
+        $skiPreferenceList = $skiPreferenceRepository->findAll();
+        return $this->json($skiPreferenceList);
     }
 }

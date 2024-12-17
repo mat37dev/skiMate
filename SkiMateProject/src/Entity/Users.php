@@ -175,7 +175,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getUserIdentifier(): string
     {
-        return $this->email;
+        return $this->id;
     }
 
     public function getSkiResort(): ?SkiResort

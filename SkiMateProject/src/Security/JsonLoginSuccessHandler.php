@@ -30,7 +30,7 @@ class JsonLoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         $user = $token->getUser();
         $jwt = $this->jwtManager->create($user);
 
-        $existingRefreshToken = $this->refreshTokenRepository->findOneBy(['username' => $user->getUserIdentifier()]);
+        $existingRefreshToken = $this->refreshTokenRepository->findOneBy(['id' => $user->getUserIdentifier()]);
         if($existingRefreshToken) {
             $this->refreshTokenManager->delete($existingRefreshToken);
         }

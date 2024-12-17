@@ -8,10 +8,15 @@ security:
         Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
 
     providers:
-        app_user_provider:
+        app_user_provider_email:
             entity:
                 class: App\Entity\Users
                 property: email
+
+        app_user_provider_id:
+            entity:
+                class: App\Entity\Users
+                property: id
 
     firewalls:
         dev:
@@ -20,22 +25,18 @@ security:
         login:
             pattern: ^/api/login$
             stateless: true
-            provider: app_user_provider
+            provider: app_user_provider_email
             json_login:
                 check_path: /api/login
                 username_path: email
                 password_path: password
                 success_handler: 'App\Security\JsonLoginSuccessHandler'
                 failure_handler: 'App\Security\JsonLoginFailureHandler'
-        register:
-            pattern: ^/api/register$
-            stateless: true
-            provider: app_user_provider
 
         api:
             pattern: ^/api
             stateless: true
-            provider: app_user_provider
+            provider: app_user_provider_id
             jwt: ~
             entry_point: App\Security\ApiAuthenticationEntryPoint
             refresh_jwt:

@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\SkiLevelRepository;
+use App\Repository\SkiPreferenceRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: SkiLevelRepository::class)]
-class SkiLevel
+#[ORM\Entity(repositoryClass: SkiPreferenceRepository::class)]
+class SkiPreference
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -15,10 +15,6 @@ class SkiLevel
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
-
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $originName = null;
-
 
     public function getId(): ?int
     {
@@ -33,18 +29,6 @@ class SkiLevel
     public function setName(string $name): static
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function getOriginName(): ?string
-    {
-        return $this->originName;
-    }
-
-    public function setOriginName(?string $originName): static
-    {
-        $this->originName = $originName;
 
         return $this;
     }

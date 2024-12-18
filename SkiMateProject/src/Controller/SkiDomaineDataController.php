@@ -131,4 +131,21 @@ class SkiDomaineDataController extends AbstractController
 
         return new JsonResponse($geoJson);
     }
+
+    #[Route('/stations', name: 'app_get_stations', methods: ['GET'])]
+    public function getStationList(DocumentManager $documentManager): JsonResponse
+    {
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $stations = $stationRepository->findAll();
+
+        $results = [];
+        foreach ($stations as $station) {
+            $results[] = [
+                'name' => $station->getName(),
+                'osmId' => $station->getOsmId(),
+            ];
+        }
+
+        return new JsonResponse($results);
+    }
 }

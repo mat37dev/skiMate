@@ -1,39 +1,28 @@
+# Utiliser l'image de base officielle PHP avec Apache
 FROM php:8.3-apache
 
-# Update and install necessary packages, and PHP extensions
-RUN apt-get update && \
-    apt-get upgrade -y && \
+# Mettre à jour les dépôts et installer les dépendances nécessaires
+RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends \
-        zlib1g-dev \
-        libwebp-dev \
-        libpng-dev \
-        libzip-dev \
-        default-mysql-client && \
-    docker-php-ext-install gd zip pdo_mysql && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+    zlib1g-dev \
+    libwebp-dev \
+    libpng-dev \
+    libzip-dev \
+    default-mysql-client \
+    && docker-php-ext-enable mongodb \
+    && docker-php-ext-install gd zip pdo_mysql \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+# Configuration PHP (si nécessaire, ajouter vos propres fichiers php.ini)
+RUN echo "date.timezone=Europe/Paris" > /usr/local/etc/php/conf.d/timezone.ini
 
 
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+# Donner les bons droits pour Apache
+RUN chown -R www-data:www-data /var/www/html && \
+    chmod -R 755 /var/www/html
 
-# Copy project files to the working directory
-COPY . /var/www/html/
-
-# Set the working directory
-WORKDIR /var/www/html
-
-# Set the environment variables
-ENV MYSQL_HOST=mysql \
-    MYSQL_USER=skimate_user \
-    MYSQL_PASSWORD=skimate \
-    MYSQL_DATABASE=skimate
-
-# Expose port 80
+# Exposer le port 80 pour le serveur web
 EXPOSE 80
 
-# Start Apache server
+# Lancer Apache en mode foreground
 CMD ["apache2-foreground"]

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Document\Station;
 use App\Entity\Session;
 use App\Repository\SessionRepository;
+use App\Repository\SkiLevelRepository;
+use App\Repository\SkiPreferenceRepository;
 use App\Repository\UsersRepository;
-
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,9 +34,9 @@ class ProfileController extends AbstractController
     }
 
     #[Route('/', name: 'app_profile', methods: ['GET'])]
-    public function index(SerializerInterface $serializer): JsonResponse
+    public function index(SerializerInterface $serializer, DocumentManager $documentManager): JsonResponse
     {
-        $user = $this->userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        $user = $this->userRepository->findOneBy(['id' => $this->getUser()->getUserIdentifier()]);
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
@@ -42,11 +44,22 @@ class ProfileController extends AbstractController
 
         $userSerialize = json_decode($serializer->serialize($user, 'json'), true);
         unset($userSerialize['password']);
+        unset($userSerialize['userIdentifier']);
+
+        $osmId = $user->getOsmId();
+        $stationName = null;
+        if ($osmId) {
+            $stationRepo = $documentManager->getRepository(Station::class);
+            $station = $stationRepo->findOneBy(['osmId' => $osmId]);
+            if ($station) {
+                $stationName = $station->getName();
+            }
+        }
         $userData = [
             "user" => $userSerialize,
-            "sessions" => json_decode($serializer->serialize($sessions, 'json'), true)
+            "sessions" => json_decode($serializer->serialize($sessions, 'json'), true),
+            'stationName' => $stationName
         ];
-
 
         return new JsonResponse($userData);
     }
@@ -54,7 +67,7 @@ class ProfileController extends AbstractController
     #[Route('/session/new', name: 'app_add_session_profile', methods: ['POST'])]
     public function addSession(Request $request, SessionRepository $sessionRepository, ValidatorInterface $validator): JsonResponse
     {
-        $user = $this->userRepository->findOneBy(['email' => $this->getUser()->getUserIdentifier()]);
+        $user = $this->userRepository->findOneBy(['id' => $this->getUser()->getUserIdentifier()]);
         if (!$user) {
             return new JsonResponse(['message' => 'Utilisateur non authentifié'], Response::HTTP_UNAUTHORIZED);
         }
@@ -107,5 +120,125 @@ class ProfileController extends AbstractController
         $entityManager->remove($session);
         $entityManager->flush();
         return new JsonResponse(['message' => 'Session supprimée avec succès'], Response::HTTP_OK);
+    }
+
+    #[Route('/settings', name: 'app_profile_settings', methods: ['GET'])]
+    public function getSkiLevel(SkiLevelRepository $skiLevelRepository,SkiPreferenceRepository $skiPreferenceRepository): JsonResponse
+    {
+        $skiLevelList = $skiLevelRepository->findAll();
+        $skiPreferenceList = $skiPreferenceRepository->findAll();
+        $data = [
+            "skiLevelList" => $skiLevelList,
+            "skiPreferenceList" => $skiPreferenceList
+        ];
+        return $this->json($data);
+    }
+
+    #[Route('/user-edit', name: 'app_user_edit', methods: ['POST'])]
+    public function profileEdit(Request $request, EntityManagerInterface $em, ValidatorInterface $validator, UsersRepository $userRepository,
+        SkiLevelRepository $skiLevelRepository, SkiPreferenceRepository $skiPreferenceRepository, DocumentManager $documentManager): JsonResponse {
+        $user = $userRepository->findOneBy(['id' => $this->getUser()->getUserIdentifier()]);
+
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non authentifié.'], 401);
+        }
+
+        $data = json_decode($request->getContent(), true);
+
+        $lastname = $data['lastname'] ?? null;
+        if ($lastname !== null) {
+            $user->setLastname($lastname);
+        }
+
+        $firstname = $data['firstname'] ?? null;
+        if ($firstname !== null) {
+            $user->setFirstname($firstname);
+        }
+
+        $email = $data['email'] ?? null;
+        if ($email !== null) {
+            $user->setEmail($email);
+        }
+
+        $phoneNumber = $data['phoneNumber'] ?? null;
+        if ($phoneNumber !== null) {
+            $user->setPhoneNumber($phoneNumber);
+        }
+
+        $skiLevelId = $data['skiLevel'] ?? null;
+        if ($skiLevelId !== null) {
+            $skiLevel = $skiLevelRepository->findOneBy(["id"=>$skiLevelId]);
+            if (!$skiLevel) {
+                return $this->json(['error' => 'SkiLevel invalide.'], 400);
+            }
+            $user->setSkiLevel($skiLevel);
+        }
+
+        $skiPreferenceId = $data['skiPreference'] ?? null;
+        if ($skiPreferenceId !== null) {
+            $skiPreference = $skiPreferenceRepository->findOneBy(["id"=>$skiPreferenceId]);
+            if (!$skiPreference) {
+                return $this->json(['error' => 'SkiPreference invalide.'], 400);
+            }
+            $user->setSkiPreference($skiPreference);
+        }
+
+        $osmId = $data['osmId'] ?? null;
+        if ($osmId !== null) {
+            $stationRepository = $documentManager->getRepository(Station::class);
+            $station = $stationRepository->findOneBy(['osmId' => $osmId]);
+            if (!$station) {
+                return $this->json(['error' => 'Station non trouvée.'], 400);
+            }
+            $user->setOsmId($osmId);
+        }
+
+        $errors = $validator->validate($user);
+        if (count($errors) > 0) {
+            $errorsArray = [];
+            foreach ($errors as $error) {
+                $errorsArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $this->json(['errors' => $errorsArray], 400);
+        }
+
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Profil mis à jour avec succès',
+            'user' => [
+                'lastname' => $user->getLastname(),
+                'firstname' => $user->getFirstname(),
+                'email' => $user->getEmail(),
+                'phoneNumber' => $user->getPhoneNumber(),
+                'skiLevel' => $user->getSkiLevel()?->getName(),
+                'skiPreference' => $user->getSkiPreference()?->getName(),
+                'osmId' => $user->getOsmId(),
+            ]
+        ]);
+    }
+
+    #[Route('/user-remove-station', name: 'app_user_remove_station', methods: ['GET'])]
+    public function removeUserStation(UsersRepository $userRepository, EntityManagerInterface $em): JsonResponse
+    {
+        $user = $userRepository->findOneBy(['id' => $this->getUser()->getUserIdentifier()]);
+
+        if (!$user) {
+            return $this->json(['error' => 'Utilisateur non authentifié'], 401);
+        }
+
+        $user->setOsmId(null);
+        $em->persist($user);
+        $em->flush();
+
+        return $this->json([
+            'message' => 'Station désélectionnée avec succès',
+            'user' => [
+                'id' => $user->getId(),
+                'email' => $user->getEmail(),
+                'osmId' => $user->getOsmId(), // désormais null
+            ]
+        ]);
     }
 }

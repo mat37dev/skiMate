@@ -28,6 +28,9 @@ class Comment
     #[ORM\ManyToOne]
     private ?Users $users = null;
 
+    #[ORM\Column(nullable: true)]
+    private ?int $note = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -89,6 +92,18 @@ class Comment
     public function setUsers(?Users $users): static
     {
         $this->users = $users;
+
+        return $this;
+    }
+
+    public function getNote(): ?int
+    {
+        return $this->note;
+    }
+
+    public function setNote(?int $note): static
+    {
+        $this->note = $note;
 
         return $this;
     }

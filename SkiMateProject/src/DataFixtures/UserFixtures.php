@@ -4,7 +4,6 @@ namespace App\DataFixtures;
 
 
 use App\Entity\Roles;
-
 use App\Entity\Session;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
@@ -41,7 +40,6 @@ class UserFixtures extends Fixture
             $user->setPassword($hashedPassword);
             $user->setPhoneNumber($faker->phoneNumber());
             $user->addRole($roleUser);
-
 
             $manager->persist($user);
             $manager->flush();

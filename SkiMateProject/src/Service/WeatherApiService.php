@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Document\Snowfall;
+use App\Document\Station;
 use App\Document\WeatherForecast;
 use App\Entity\SkiResort;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -25,18 +26,19 @@ class WeatherApiService
 
     public function saveWeeklyWeatherForAllLocations(): void
     {
-        // Récupérer toutes les stations (avec coordonnées) depuis la base de données
-        //Attention, il faudra récupérer toutes les stations et mettre le try dans une boucle!
+        $stationRepository = $this->documentManager->getRepository(Station::class);
+        $stations = $stationRepository->findAll();
+        foreach ($stations as $station) {
+            $location = strtolower($station->getName());
+            $latitude = $station->getLatitude();
+            $longitude = $station->getLongitude();
 
-        //Données de test
-        $location = 'La Plagne';
-        $location = strtolower($location);
-        // Appeler la méthode pour chaque station
-        try {
-            $this->saveWeeklyWeather('45.5057', '6.6803', $location);
-        } catch (\Exception $e) {
-            // Log en cas d'échec pour une station spécifique
-            $this->logger->error("Échec de la mise à jour pour la station $location : {$e->getMessage()}");
+            try {
+                $this->saveWeeklyWeather($latitude, $longitude, $location);
+            } catch (\Exception $e) {
+                // Log en cas d'échec pour une station spécifique
+                $this->logger->error("Échec de la mise à jour pour la station $location : {$e->getMessage()}");
+            }
         }
     }
 

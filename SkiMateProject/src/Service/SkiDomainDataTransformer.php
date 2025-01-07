@@ -14,19 +14,16 @@ class SkiDomainDataTransformer
         $station->setName($stationElement['tags']['name'] ?? 'Station sans nom');
         $station->setTags($stationElement['tags'] ?? []);
 
-        // Construire la geometry (Polygon)
+        // Extraire et normaliser la géométrie
         $coords = $this->extractWayGeometry($stationElement, $stationsData);
         $station->setGeometry([
-            'type' => 'Polygon',
-            'coordinates' => [$coords]
+            'type' => 'LineString',
+            'coordinates' => $coords
         ]);
 
         return $station;
     }
 
-    /**
-     * Transforme les données des features récupérées en véritables features GeoJSON.
-     */
     public function transformAllFeatures(array $featuresData): array
     {
         $features = [];
@@ -43,11 +40,15 @@ class SkiDomainDataTransformer
     {
         $tags = $element['tags'] ?? [];
         $category = $this->determineCategory($tags);
+
         if (!$category) {
             return null;
         }
 
         $geometry = $this->extractGeometry($element, $data);
+
+        // Ajouter un champ d'orientation calculé
+        $orientation = $this->calculateOrientation($geometry);
 
         return [
             "type" => "Feature",
@@ -55,29 +56,21 @@ class SkiDomainDataTransformer
             "properties" => [
                 "source" => "osm",
                 "category" => $category,
-                "tags" => $tags
-            ],
-            // Si vous voulez conserver l'information "validated":
-            "validated" => false
+                "name" => $tags['name'] ?? 'Sans nom',
+                "difficulty" => $tags['piste:difficulty'] ?? null,
+                "tags" => $tags,
+                "orientation" => $orientation // Ajout de l'orientation
+            ]
         ];
     }
 
     private function determineCategory(array $tags): ?string
     {
         if (isset($tags['piste:type']) && $tags['piste:type'] === 'downhill') {
-            return 'piste';
+            return 'run';
         }
         if (isset($tags['aerialway'])) {
-            return 'lift'; // note: vous pouvez appeler ça 'remontee' si besoin
-        }
-        if (isset($tags['amenity'])) {
-            if ($tags['amenity'] === 'restaurant') return 'restaurant';
-            if ($tags['amenity'] === 'toilets') return 'wc';
-            if ($tags['amenity'] === 'picnic_site') return 'picnic';
-        }
-        if (isset($tags['tourism'])) {
-            if ($tags['tourism'] === 'viewpoint') return 'viewpoint';
-            if ($tags['tourism'] === 'information') return 'information';
+            return 'lift';
         }
         return null;
     }
@@ -87,7 +80,7 @@ class SkiDomainDataTransformer
         $nodes = $wayElement['nodes'] ?? [];
         $coords = [];
 
-        // Indexer tous les nodes par leur id
+        // Indexer les nœuds par leur ID
         $nodesById = [];
         foreach ($data['elements'] as $el) {
             if ($el['type'] === 'node') {
@@ -95,33 +88,59 @@ class SkiDomainDataTransformer
             }
         }
 
+        // Construire les coordonnées dans l'ordre des nœuds
         foreach ($nodes as $nodeId) {
             if (isset($nodesById[$nodeId])) {
                 $coords[] = [$nodesById[$nodeId]['lon'], $nodesById[$nodeId]['lat']];
             }
         }
+
+        // Normaliser l'ordre pour s'assurer que le point le plus haut est en premier
+        if (count($coords) > 1) {
+            $highestPointIndex = array_search(max(array_column($coords, 1)), array_column($coords, 1));
+            $lowestPointIndex = array_search(min(array_column($coords, 1)), array_column($coords, 1));
+
+            if ($highestPointIndex > $lowestPointIndex) {
+                $coords = array_reverse($coords);
+            }
+        }
+
         return $coords;
     }
 
     private function extractGeometry(array $element, array $data): array
     {
         if ($element['type'] === 'node') {
-            $lon = $element['lon'];
-            $lat = $element['lat'];
             return [
                 'type' => 'Point',
-                'coordinates' => [$lon, $lat]
+                'coordinates' => [$element['lon'], $element['lat']]
             ];
         } elseif ($element['type'] === 'way') {
-            // pour une piste (LineString)
-            $coords = $this->extractWayGeometry($element, $data);
             return [
                 'type' => 'LineString',
-                'coordinates' => $coords
+                'coordinates' => $this->extractWayGeometry($element, $data)
             ];
         }
 
-        // Par défaut, on renvoie un type vide.
         return ['type' => 'GeometryCollection', 'coordinates' => []];
     }
+
+    private function calculateOrientation(array $geometry): float
+    {
+        if ($geometry['type'] === 'LineString' && count($geometry['coordinates']) > 1) {
+            $firstPoint = $geometry['coordinates'][0];
+            $lastPoint = $geometry['coordinates'][count($geometry['coordinates']) - 1];
+
+            // Calculer l'angle entre le point de départ et d'arrivée
+            $deltaX = $lastPoint[0] - $firstPoint[0];
+            $deltaY = $lastPoint[1] - $firstPoint[1];
+            $angle = rad2deg(atan2($deltaY, $deltaX));
+
+            // Normaliser l'angle entre 0 et 360°
+            return ($angle + 360) % 360;
+        }
+
+        return 0.0; // Angle par défaut pour des géométries invalides
+    }
+
 }

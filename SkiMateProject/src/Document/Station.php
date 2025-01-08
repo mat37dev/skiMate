@@ -35,6 +35,12 @@ class Station
     #[ODM\Field(type: "string")]
     private string $osmId;
 
+    #[ODM\Field(type: "float")]
+    private ?float $latitude = null;
+
+    #[ODM\Field(type: "float")]
+    private ?float $longitude = null;
+
     // Tableau des items (pistes, remontées, POI...) liés à la station
     // Chaque item sera un tableau associatif similaire à un Feature GeoJSON :
     // {
@@ -130,6 +136,28 @@ class Station
     public function setFeatures(array $features): self
     {
         $this->features = $features;
+        return $this;
+    }
+
+    public function getLatitude(): ?float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(?float $latitude): self
+    {
+        $this->latitude = $latitude;
+        return $this;
+    }
+
+    public function getLongitude(): ?float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(?float $longitude): self
+    {
+        $this->longitude = $longitude;
         return $this;
     }
 }

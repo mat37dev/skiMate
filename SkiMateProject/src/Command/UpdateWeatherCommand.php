@@ -11,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'app:update-weather')]
 class UpdateWeatherCommand extends Command
 {
-    protected static string $defaultName = 'app:update-weather';
+    protected static $defaultName = 'app:update-weather';
     private WeatherApiService $weatherApiService;
 
     public function __construct(WeatherApiService $weatherApiService)

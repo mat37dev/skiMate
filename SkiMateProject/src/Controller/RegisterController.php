@@ -28,7 +28,7 @@ class RegisterController extends AbstractController
         }
         else if(!$this->isPasswordValid($password)) {
             return new JsonResponse(['message' => 'Le mot de passe doit contenir au moins 8 caractères, 
-            une majuscule, une minuscule, un chiffre et un caractère spécial.'], Response::HTTP_BAD_REQUEST);
+            une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&_).'], Response::HTTP_BAD_REQUEST);
         }
 
         $user = new Users();
@@ -58,7 +58,7 @@ class RegisterController extends AbstractController
 
     public function isPasswordValid(string $password): bool
     {
-        $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
+        $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/';
         return preg_match($passwordRegex, $password) === 1;
     }
 }

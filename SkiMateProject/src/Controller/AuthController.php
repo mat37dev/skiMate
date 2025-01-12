@@ -49,6 +49,10 @@ class AuthController extends AbstractController
         if (!$code || !$newPassword) {
             return new JsonResponse(['message' => 'Code ou mot de passe manquant'], Response::HTTP_BAD_REQUEST);
         }
+        else if(!$this->isPasswordValid($newPassword)) {
+            return new JsonResponse(['message' => 'Le mot de passe doit contenir au moins 8 caractères, 
+            une majuscule, une minuscule, un chiffre et un caractère spécial.'], Response::HTTP_BAD_REQUEST);
+        }
 
         $success = $resetService->resetPassword($code, $newPassword);
         if ($success) {
@@ -56,5 +60,11 @@ class AuthController extends AbstractController
         } else {
             return new JsonResponse(['message' => 'Code invalide ou expiré'], 400);
         }
+    }
+
+    public function isPasswordValid(string $password): bool
+    {
+        $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/';
+        return preg_match($passwordRegex, $password) === 1;
     }
 }

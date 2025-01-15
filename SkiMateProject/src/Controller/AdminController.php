@@ -7,33 +7,28 @@ namespace App\Controller;
 use App\Entity\Users;
 use App\Repository\RolesRepository;
 use App\Repository\UsersRepository;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api/admin')]
 class AdminController extends AbstractController
 {
     #[Route('/utilisateurs', name: 'app_users')]
-    public function listUsers(UsersRepository $usersRepository): JsonResponse
+    public function listUsers(UsersRepository $usersRepository, SerializerInterface $serializer): JsonResponse
     {
         $users = $usersRepository->findAll();
         $userData = [];
         foreach ($users as $user) {
-            $userData[] = [
-                'id' => $user->getId(),
-                'nom' => $user->getFirstname(),
-                'prenom' => $user->getLastname(),
-                'email' => $user->getEmail(),
-                'roles' => $user->getRoles(),
-                'password' => $user->getPassword(),
-                'phoneNumber' => $user->getPhoneNumber(),
-            ];
+            $userSerialize = json_decode($serializer->serialize($user, 'json'), true);
+            unset($userSerialize['password']);
+            $userData[] = $userSerialize;
         }
         return $this->json($userData, 200);
     }

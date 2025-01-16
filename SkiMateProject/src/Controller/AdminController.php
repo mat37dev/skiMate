@@ -20,10 +20,18 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api/admin')]
 class AdminController extends AbstractController
 {
-    #[Route('/utilisateurs', name: 'app_users')]
-    public function listUsers(UsersRepository $usersRepository, SerializerInterface $serializer): JsonResponse
-    {
-        $users = $usersRepository->findAll();
+    #[Route('/utilisateurs', name: 'app_users', methods: ['GET'])]
+    public function listUsers(
+        Request $request,
+        UsersRepository $usersRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $search = $request->query->get('search'); // ex: "Crosnier Mathieu"
+        $role = $request->query->get('role');     // ex: "ROLE_ADMIN"
+
+        // Appel du repository
+        $users = $usersRepository->searchUsers($search, $role);
+
         $userData = [];
         foreach ($users as $user) {
             $userSerialize = json_decode($serializer->serialize($user, 'json'), true);
@@ -32,6 +40,7 @@ class AdminController extends AbstractController
         }
         return $this->json($userData, 200);
     }
+
 
     #[Route('/utilisateur/add', name: "app_user_add", methods: ['POST'])]
     public function addUser(Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator, UsersRepository $usersRepository, RolesRepository $rolesRepository): JsonResponse
@@ -106,5 +115,10 @@ class AdminController extends AbstractController
         $usersRepository->save($user);
 
         return new JsonResponse(['message' => 'Utilisateur mis à jour avec succès'], Response::HTTP_OK);
+    }
+
+    #[Route('/roles/liste', name: 'app_roles_liste', methods: ['GET'])]
+    public function  getRoles(RolesRepository $rolesRepository): JsonResponse{
+        return $this->json($rolesRepository->findAll(), Response::HTTP_OK);
     }
 }

@@ -122,7 +122,7 @@ class ProfileController extends AbstractController
         return new JsonResponse(['message' => 'Session supprimée avec succès'], Response::HTTP_OK);
     }
 
-    #[Route('/settings', name: 'app_profile_settings', methods: ['GET'])]
+    #[Route('/get-preference-list', name: 'app_profile_preference_list', methods: ['GET'])]
     public function getSkiLevel(SkiLevelRepository $skiLevelRepository,SkiPreferenceRepository $skiPreferenceRepository): JsonResponse
     {
         $skiLevelList = $skiLevelRepository->findAll();

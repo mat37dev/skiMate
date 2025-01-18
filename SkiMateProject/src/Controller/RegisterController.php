@@ -21,9 +21,14 @@ class RegisterController extends AbstractController
     {
 
         $data = json_decode($request->getContent(), true);
+        $password = $data['password'];
 
-        if($data["password"] !== $data["confirmPassword"]){
+        if($password !== $data["confirmPassword"]){
             return new JsonResponse(['errors'=>'les mots de passe ne correspondent pas'], Response::HTTP_BAD_REQUEST);
+        }
+        else if(!$this->isPasswordValid($password)) {
+            return new JsonResponse(['message' => 'Le mot de passe doit contenir au moins 8 caractères, 
+            une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&_).'], Response::HTTP_BAD_REQUEST);
         }
 
         $user = new Users();
@@ -33,7 +38,7 @@ class RegisterController extends AbstractController
         $user->setPassword(
             $passwordHasher->hashPassword(
                 $user,
-                $data['password']
+                $password
             ));
         $user->setPhoneNumber($data['phoneNumber']);
         $user->addRole($rolesRepository->findOneBy(['name' => 'ROLE_USER']));
@@ -49,5 +54,11 @@ class RegisterController extends AbstractController
             $usersRepository->save($user);
             return new JsonResponse(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
         }
+    }
+
+    public function isPasswordValid(string $password): bool
+    {
+        $passwordRegex = '/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_])[A-Za-z\d@$!%*?&_]{8,}$/';
+        return preg_match($passwordRegex, $password) === 1;
     }
 }

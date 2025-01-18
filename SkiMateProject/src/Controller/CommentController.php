@@ -25,9 +25,10 @@ class CommentController extends AbstractController
     public function listComments(): JsonResponse
     {
         $comments = $this->commentRepository->findAll();
+
         $commentsData = [];
         foreach ($comments as $comment) {
-            $commentsData[] = [
+            $commentData[] = [
                 'id' => $comment->getId(),
                 'title' => $comment->getTitle(),
                 'description' => $comment->getDescription(),
@@ -37,45 +38,38 @@ class CommentController extends AbstractController
         return $this->json($commentsData, 200);
     }
 
-    #[Route('/comment/add', name: 'app_add_comment', methods: ["POST"])]
+    #[Route('/comments/add', name: 'app_add_comment', methods: ["POST"])]
     public function AddComment(Request $request): JsonResponse
     {
-        if(!isset($data['title'], $data['description'], $data['note'])){
-            return $this->json(['error'=>'Invalid input data'], Response::HTTP_BAD_REQUEST);
-        }
-
         $data = json_decode($request->getContent(), true);
         $comment = new Comment();
         $comment->setTitle($data['title']);
         $comment->setDescription($data['description']);
         $comment->setNote($data['note']);
 
-        $this->entityManager->persist($comment);
-        $this->entityManager->flush();
-
         return $this->json([
             'id' => $comment->getId(),
             'title' => $comment->getTitle(),
             'description' => $comment->getDescription(),
-            'user' => $comment->getUsers()?->getId(),
+            'user' => $comment->getUsers(),
             'note' => $comment->getNote(),
         ], Response::HTTP_CREATED);
     }
     #[Route('/comment/delete/{id}', name: 'app_delete_comment', requirements: ['id'=>'\d+'], methods: ['DELETE'])]
-        public function deleteComment(Uuid $id): JsonResponse
-        {
+    public function deleteComment(Uuid $id): JsonResponse
+    {
         $comment = $this->commentRepository->find($id);
 
         if(!$comment){
-        throw $this->createNotFoundException('commentaire non trouvé');
+            throw $this->createNotFoundException('commentaire non trouvé');
         }
 
         $this->entityManager->remove($comment);
         $this->entityManager->flush();
 
         return $this->json([
-           'commentaire supprimé'
-        ],Response::HTTP_OK);
+            'commentaire supprimé'
+        ],200);
     }
 
     #[Route('/comment/edit/{id}', name: 'app_edit_comment', methods: ['PUT'])]
@@ -83,7 +77,7 @@ class CommentController extends AbstractController
     {
         $comment = $this->commentRepository->find($id);
         if (!$comment) {
-            return new JsonResponse(['message' => 'commentaire non trouvé'], Response::HTTP_NOT_FOUND);
+            return new JsonResponse(['message' => 'Utilisateur non trouvé'], Response::HTTP_NOT_FOUND);
         }
         $data = json_decode($request->getContent(), true);
         if (isset($data['title'])) {

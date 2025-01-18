@@ -101,29 +101,30 @@ way($wayId);
 map_to_area->.stationArea;
 (
   node(area.stationArea)["piste:type"="downhill"];
-  way(area.stationArea)["piste:type"="downhill"];
+  way(area.stationArea)["piste:type"="downhill"]["area"!="yes"];
   
   node(area.stationArea)["aerialway"];
-  way(area.stationArea)["aerialway"];
+  way(area.stationArea)["aerialway"]["area"!="yes"];
 
   node(area.stationArea)["amenity"="restaurant"];
-  way(area.stationArea)["amenity"="restaurant"];
+  way(area.stationArea)["amenity"="restaurant"]["area"!="yes"];
 
   node(area.stationArea)["amenity"="toilets"];
-  way(area.stationArea)["amenity"="toilets"];
+  way(area.stationArea)["amenity"="toilets"]["area"!="yes"];
 
   node(area.stationArea)["amenity"="picnic_site"];
-  way(area.stationArea)["amenity"="picnic_site"];
+  way(area.stationArea)["amenity"="picnic_site"]["area"!="yes"];
 
   node(area.stationArea)["tourism"="viewpoint"];
-  way(area.stationArea)["tourism"="viewpoint"];
+  way(area.stationArea)["tourism"="viewpoint"]["area"!="yes"];
 
   node(area.stationArea)["tourism"="information"];
-  way(area.stationArea)["tourism"="information"];
+  way(area.stationArea)["tourism"="information"]["area"!="yes"];
 );
 out body;
 >;
 out skel qt;
+
 OVERPASS;
     }
 }

@@ -77,8 +77,7 @@ class CommentController extends AbstractController
             throw $this->createNotFoundException('commentaire non trouvé');
         }
 
-        $this->entityManager->remove($comment);
-        $this->entityManager->flush();
+        $this->commentRepository->remove($comment);
 
         return $this->json([
             'commentaire supprimé'

@@ -47,29 +47,48 @@ class AdminController extends AbstractController
     public function addUser(Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator,
                             UsersRepository $usersRepository, RolesRepository $rolesRepository): JsonResponse
     {
+
         $data = json_decode($request->getContent(), true);
         $user = new Users();
-        $user->setEmail($data['email']);
-        $user->setFirstName($data['firstName']);
-        $user->setLastName($data['lastName']);
-        $user->setPassword(
-            $passwordHasher->hashPassword(
-                $user,
-                $data['password']
-            ));
-        $user->setPhoneNumber($data['phoneNumber']);
-        $user->addRole($rolesRepository->findOneBy(['name' => $data['roles']]));
+        if(isset($data['email'])){
+            $user->setEmail($data['email']);
+        }
+        if(isset($data['password'])){
+            $user->setPassword(
+                $passwordHasher->hashPassword(
+                    $user,
+                    $data['password']
+                ));
+        }
+        if(isset($data['roles'])){
+            foreach ($data['roles'] as $role) {
+                $user->addRole($rolesRepository->findOneBy(['name' => $role]));
+            }
+        }
+
+        if(isset($data['firstName'])){
+            $user->setFirstName($data['firstName']);
+        }
+
+        if(isset($data['lastName'])){
+            $user->setFirstName($data['lastName']);
+        }
+
+        if(isset($data['phoneNumber'])){
+            $user->setFirstName($data['phoneNumber']);
+        }
+
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
             $errorsList = [];
             foreach ($errors as $error) {
-                $errorsList[$error->getPropertyPath()] = $error->getMessage();
+                $errorsList[] = $error->getMessage();
             }
             return new JsonResponse(['errors' => $errorsList], Response::HTTP_BAD_REQUEST);
         }
         else{
             $usersRepository->save($user);
-            return new JsonResponse(['message' => 'Utilisateur créé avec succès'], Response::HTTP_CREATED);
+            return new JsonResponse(['message' => ['Utilisateur créé avec succès']], Response::HTTP_CREATED);
         }
     }
 
@@ -105,7 +124,7 @@ class AdminController extends AbstractController
         }
         if (isset($data['roles'])) {
             foreach ($user->getRoles() as $role) {
-                $user->removeRole($rolesRepository->findOneBy(['name' => $data['roles']]));
+                $user->removeRole($rolesRepository->findOneBy(['name' => $role]));
             }
             foreach ($data['roles'] as $roleName) {
                 $role = $rolesRepository->findOneBy(['name' => $roleName]);
@@ -136,7 +155,7 @@ class AdminController extends AbstractController
         }
         $usersRepository->save($user);
 
-        return new JsonResponse(['message' => 'Utilisateur mis à jour avec succès'], Response::HTTP_OK);
+        return new JsonResponse(['message' => ['Utilisateur mis à jour avec succès']], Response::HTTP_OK);
     }
 
     #[Route('/roles/liste', name: 'app_admin_roles_liste', methods: ['GET'])]

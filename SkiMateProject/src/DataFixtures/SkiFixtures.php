@@ -6,10 +6,15 @@ use App\Entity\SkiLevel;
 use App\Entity\SkiPreference;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 
-class SkiFixtures extends Fixture implements FixtureGroupInterface {
+class SkiFixtures extends Fixture implements FixtureGroupInterface, OrderedFixtureInterface {
 
+    public function getOrder(): int
+    {
+        return 2;
+    }
     public function load(ObjectManager $manager): void
     {
         $preferenceType = ["Piste", "Hors Piste", "Snow Park"];
@@ -32,6 +37,8 @@ class SkiFixtures extends Fixture implements FixtureGroupInterface {
         }
         $manager->flush();
     }
+
+
 
     public static function getGroups(): array
     {

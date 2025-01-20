@@ -22,24 +22,24 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
+    #[Assert\NotBlank(message: 'Le champ "Nom" ne peut pas être vide.')]
     private ?string $lastname = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
+    #[Assert\NotBlank(message: 'Le champ "Prénom" ne peut pas être vide.')]
     private ?string $firstname = null;
 
     #[ORM\Column( length: 255, unique: true)]
-    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide.')]
-    #[Assert\Email(message: "L'adresse email n'est pas valide")]
+    #[Assert\NotBlank(message: 'Le champ "Email" ne peut pas être vide.')]
+    #[Assert\Email(message: "L'adresse email n'est pas valide.")]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
+    #[Assert\NotBlank(message: 'Le champ "Mot de Passe" ne peut pas être vide.')]
     private ?string $password = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Ce champ ne peut pas être vide')]
+    #[Assert\NotBlank(message: 'Le champ "Numéro de "Téléphone" ne peut pas être vide.')]
     private ?string $phoneNumber = null;
 
     #[ORM\ManyToMany(targetEntity: Roles::class)]

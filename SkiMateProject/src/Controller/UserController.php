@@ -49,7 +49,7 @@ class UserController extends AbstractController
         $user = $this->userRepository->find($id);
 
         if (!$user) {
-            throw $this->createNotFoundException('user not found');
+            throw $this->createNotFoundException('utilisateur non trouvé');
         }
 
         $userData = [
@@ -128,6 +128,4 @@ class UserController extends AbstractController
             'user deleted'
         ], 200);
     }
-
-
 }

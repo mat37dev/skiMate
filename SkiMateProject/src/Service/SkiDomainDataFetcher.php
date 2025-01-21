@@ -72,7 +72,7 @@ class SkiDomainDataFetcher
 [out:json][timeout:25];
 area["name"="$domainName"]->.searchArea;
 way(area.searchArea)["landuse"="winter_sports"];
-out body;
+out body center;
 >;
 out skel qt;
 OVERPASS;

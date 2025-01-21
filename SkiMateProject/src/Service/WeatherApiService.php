@@ -211,7 +211,7 @@ class WeatherApiService
             $sum['snow_depth']     += $data['snow_depth']     ?? 0;
             $sum['wind_speed_10m'] += $data['wind_speed_10m'] ?? 0;
 
-            if (isset($data['weather_code']) && $data['weather_code'] !== null) {
+            if (isset($data['weather_code'])) {
                 $weatherCodes[] = (int)$data['weather_code'];
             }
         }

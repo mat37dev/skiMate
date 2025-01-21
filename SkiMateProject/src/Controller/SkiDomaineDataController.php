@@ -39,6 +39,8 @@ class SkiDomaineDataController extends AbstractController
                 $stationName = $stationElement['tags']['name'] ?? null;
                 if ($stationName && $stationName !== $domainName) {
                     $wayId = $stationElement['id'];
+                    $lat = $stationElement['center']['lat'] ?? null;
+                    $long = $stationElement['center']['lon'] ?? null;
 
                     // Transformer la station
                     $station = $transformer->transformStation($domainName, $stationElement, $stationsData);
@@ -63,6 +65,8 @@ class SkiDomaineDataController extends AbstractController
                     $features = $transformer->transformAllFeatures($featuresData);
                     $station->setFeatures($features);
 
+                    $station->setLongitude($long);
+                    $station->setLatitude($lat);
                     // Mettre à jour la station avec ses features
                     $documentManager->persist($station);
                     $documentManager->flush();

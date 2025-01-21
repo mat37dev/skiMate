@@ -20,9 +20,6 @@ class SkiDomainDataTransformer
             'type' => 'LineString',
             'coordinates' => $coords
         ]);
-
-        $station->setLatitude($coords[0][1]);
-        $station->setLongitude($coords[0][0]);
         return $station;
     }
 

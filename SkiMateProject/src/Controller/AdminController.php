@@ -9,6 +9,7 @@ use App\Repository\RolesRepository;
 use App\Repository\SkiLevelRepository;
 use App\Repository\SkiPreferenceRepository;
 use App\Repository\UsersRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -70,7 +71,7 @@ class AdminController extends AbstractController
         $data = json_decode($request->getContent(), true);
         $user = new Users();
 
-        if(isset($data["password"])){
+        if(!isset($data["password"])){
             return new JsonResponse(['errors' => ["Le champ 'Mot de Passe' ne peut pas être vide."]], Response::HTTP_BAD_REQUEST);
         }
 
@@ -117,11 +118,12 @@ class AdminController extends AbstractController
             foreach ($errors as $error) {
                 $errorsList[] = $error->getMessage();
             }
-            return new JsonResponse(['errors' => $errorsList, 'data'=>$data, 'test'], Response::HTTP_BAD_REQUEST);
+            return new JsonResponse(['errors' => $errorsList], Response::HTTP_BAD_REQUEST);
         }
         $usersRepository->save($user);
 
-        return new JsonResponse(['message' => ['Utilisateur mis à jour avec succès']], Response::HTTP_OK);
+        return new JsonResponse(['message' => ['Utilisateur ('.$user->getLastname().' '.$user->getFirstname().') mis à jour avec succès']],
+            Response::HTTP_OK);
     }
 
     private function userEdit(Users $user, $data): Users{
@@ -161,6 +163,25 @@ class AdminController extends AbstractController
                 ));
         }
         return $user;
+    }
+
+    #[Route('/utilisateurs/delete', name: 'app_admin_user_delete', methods: ['POST'])]
+    public function deleteUsers(Request $request, UsersRepository $usersRepository, EntityManagerInterface $entityManager): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        foreach ($data['id'] as $userId) {
+            $user = $usersRepository->find($userId);
+            if($user){
+                if($user->getUserIdentifier() == $this->getUser()->getUserIdentifier()){
+                    return new JsonResponse(['errors' => ["Vous ne pouvez pas vous supprimez vous même."]], Response::HTTP_BAD_REQUEST);
+                }
+                else{
+                    $entityManager->remove($user);
+                    $entityManager->flush();
+                }
+            }
+        }
+        return new JsonResponse(['message' => ['Utilisateur(s) supprimé(s) avec succès']], Response::HTTP_OK);
     }
 
     #[Route('/roles/liste', name: 'app_admin_roles_liste', methods: ['GET'])]

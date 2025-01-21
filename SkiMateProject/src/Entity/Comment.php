@@ -9,9 +9,10 @@ use Doctrine\ORM\Mapping as ORM;
 class Comment
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\Column(type:'string', length:36, unique:true)]
+    #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
+    private ?string $id = null;
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
@@ -28,7 +29,10 @@ class Comment
     #[ORM\ManyToOne]
     private ?Users $users = null;
 
-    public function getId(): ?int
+    #[ORM\Column(nullable: true)]
+    private ?int $note = null;
+
+    public function getId(): ?string
     {
         return $this->id;
     }
@@ -89,6 +93,18 @@ class Comment
     public function setUsers(?Users $users): static
     {
         $this->users = $users;
+
+        return $this;
+    }
+
+    public function getNote(): ?int
+    {
+        return $this->note;
+    }
+
+    public function setNote(?int $note): static
+    {
+        $this->note = $note;
 
         return $this;
     }

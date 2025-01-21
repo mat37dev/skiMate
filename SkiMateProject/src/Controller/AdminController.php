@@ -21,6 +21,27 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api/admin')]
 class AdminController extends AbstractController
 {
+    private RolesRepository $rolesRepository;
+    private SkiLevelRepository $skiLevelRepository;
+    private SkiPreferenceRepository $skiPreferenceRepository;
+    private UserPasswordHasherInterface $passwordHasher;
+
+    /**
+     * @param RolesRepository $rolesRepository
+     * @param SkiLevelRepository $skiLevelRepository
+     * @param SkiPreferenceRepository $skiPreferenceRepository
+     * @param UserPasswordHasherInterface $passwordHasher
+     */
+    public function __construct(RolesRepository $rolesRepository, SkiLevelRepository $skiLevelRepository,
+                                SkiPreferenceRepository $skiPreferenceRepository, UserPasswordHasherInterface $passwordHasher)
+    {
+        $this->rolesRepository = $rolesRepository;
+        $this->skiLevelRepository = $skiLevelRepository;
+        $this->skiPreferenceRepository = $skiPreferenceRepository;
+        $this->passwordHasher = $passwordHasher;
+    }
+
+
     #[Route('/utilisateurs', name: 'app_admin_users', methods: ['GET'])]
     public function listUsers(
         Request $request,
@@ -44,39 +65,16 @@ class AdminController extends AbstractController
 
 
     #[Route('/utilisateurs/add', name: "app_admin_user_add", methods: ['POST'])]
-    public function addUser(Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator,
-                            UsersRepository $usersRepository, RolesRepository $rolesRepository): JsonResponse
+    public function addUser(Request $request, ValidatorInterface $validator, UsersRepository $usersRepository): JsonResponse
     {
-
         $data = json_decode($request->getContent(), true);
         $user = new Users();
-        if(isset($data['email'])){
-            $user->setEmail($data['email']);
-        }
-        if(isset($data['password'])){
-            $user->setPassword(
-                $passwordHasher->hashPassword(
-                    $user,
-                    $data['password']
-                ));
-        }
-        if(isset($data['roles'])){
-            foreach ($data['roles'] as $role) {
-                $user->addRole($rolesRepository->findOneBy(['name' => $role]));
-            }
+
+        if(isset($data["password"])){
+            return new JsonResponse(['errors' => ["Le champ 'Mot de Passe' ne peut pas être vide."]], Response::HTTP_BAD_REQUEST);
         }
 
-        if(isset($data['firstName'])){
-            $user->setFirstName($data['firstName']);
-        }
-
-        if(isset($data['lastName'])){
-            $user->setFirstName($data['lastName']);
-        }
-
-        if(isset($data['phoneNumber'])){
-            $user->setFirstName($data['phoneNumber']);
-        }
+        $this->userEdit($user, $data);
 
         $errors = $validator->validate($user);
         if (count($errors) > 0) {
@@ -93,8 +91,7 @@ class AdminController extends AbstractController
     }
 
     #[Route('/utilisateurs/edit', name: 'app_admin_user_edit', methods: ['POST'])]
-    public function editAdminUser(Request $request, UsersRepository $usersRepository,RolesRepository $rolesRepository,ValidatorInterface $validator,
-                             SkiLevelRepository $skiLevelRepository, SkiPreferenceRepository $skiPreferenceRepository): JsonResponse
+    public function editAdminUser(Request $request, UsersRepository $usersRepository,ValidatorInterface $validator): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
@@ -109,7 +106,25 @@ class AdminController extends AbstractController
             return new JsonResponse(['errors' => ['Utilisateur non trouvé']], Response::HTTP_NOT_FOUND);
         }
 
-        $data = json_decode($request->getContent(), true);
+        foreach ($user->getRoles() as $role) {
+            $user->removeRole($this->rolesRepository->findOneBy(['name' => $role]));
+        }
+        $user = $this->userEdit($user, $data);
+
+        $errors = $validator->validate($user);
+        if (count($errors) > 0) {
+            $errorsList = [];
+            foreach ($errors as $error) {
+                $errorsList[] = $error->getMessage();
+            }
+            return new JsonResponse(['errors' => $errorsList, 'data'=>$data, 'test'], Response::HTTP_BAD_REQUEST);
+        }
+        $usersRepository->save($user);
+
+        return new JsonResponse(['message' => ['Utilisateur mis à jour avec succès']], Response::HTTP_OK);
+    }
+
+    private function userEdit(Users $user, $data): Users{
         if (isset($data['email'])) {
             $user->setEmail($data['email']);
         }
@@ -122,40 +137,30 @@ class AdminController extends AbstractController
         if (isset($data['phoneNumber'])) {
             $user->setPhoneNumber($data['phoneNumber']);
         }
-        if (isset($data['roles'])) {
-            foreach ($user->getRoles() as $role) {
-                $user->removeRole($rolesRepository->findOneBy(['name' => $role]));
-            }
+        if(isset($data['roles'])){
             foreach ($data['roles'] as $roleName) {
-                $role = $rolesRepository->findOneBy(['name' => $roleName]);
-                if ($role) {
-                    $user->addRole($role);
+                $roleEntity = $this->rolesRepository->findOneBy(['name' => $roleName]);
+                if ($roleEntity) {
+                    $user->addRole($roleEntity);
                 }
             }
-            if (isset($data['skiLevel'])){
-                $skiLevel = $skiLevelRepository->findOneBy(['name' => $data['skiLevel']]);
-                $user->setSkiLevel($skiLevel);
-            }
-            if(isset($data['skiPreference'])){
-                $skiPreference = $skiPreferenceRepository->findOneBy(['name' => $data['skiPreference']]);
-                $user->setSkiPreference($skiPreference);
-            }
         }
-        else{
-            return new JsonResponse(['errors' => ["Vous devez renseigner au moins un rôle."]], Response::HTTP_BAD_REQUEST);
+        if (isset($data['skiLevel'])){
+            $skiLevel = $this->skiLevelRepository->findOneBy(['name' => $data['skiLevel']]);
+            $user->setSkiLevel($skiLevel);
         }
-
-        $errors = $validator->validate($user);
-        if (count($errors) > 0) {
-            $errorsList = [];
-            foreach ($errors as $error) {
-                $errorsList[] = $error->getMessage();
-            }
-            return new JsonResponse(['errors' => $errorsList], Response::HTTP_BAD_REQUEST);
+        if(isset($data['skiPreference'])){
+            $skiPreference = $this->skiPreferenceRepository->findOneBy(['name' => $data['skiPreference']]);
+            $user->setSkiPreference($skiPreference);
         }
-        $usersRepository->save($user);
-
-        return new JsonResponse(['message' => ['Utilisateur mis à jour avec succès']], Response::HTTP_OK);
+        if(isset($data['password'])){
+            $user->setPassword(
+                $this->passwordHasher->hashPassword(
+                    $user,
+                    $data['password']
+                ));
+        }
+        return $user;
     }
 
     #[Route('/roles/liste', name: 'app_admin_roles_liste', methods: ['GET'])]

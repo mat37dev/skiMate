@@ -4,21 +4,25 @@ namespace App\DataFixtures;
 
 
 use App\Entity\Roles;
-
 use App\Entity\Session;
 use App\Entity\Users;
 use App\Repository\UsersRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
-class UserFixtures extends Fixture
+use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
     public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, UsersRepository $usersRepository)
     {
     }
 
+    public function getOrder(): int
+    {
+        return 1;
+    }
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
@@ -42,10 +46,9 @@ class UserFixtures extends Fixture
             $user->setPhoneNumber($faker->phoneNumber());
             $user->addRole($roleUser);
 
-
             $manager->persist($user);
             $manager->flush();
-        }
+    }
 
 
         $user = new Users();
@@ -77,4 +80,10 @@ class UserFixtures extends Fixture
 
         $manager->flush();
     }
+
+    public static function getGroups(): array
+    {
+        return ['user'];
+    }
+
 }

@@ -8,14 +8,16 @@ use App\Document\WeatherForecast;
 use App\Service\WeatherApiService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api')]
 class WeatherController extends AbstractController
 {
-    #[Route('/weather', name: 'weather_snow', methods: ['POST'])]
+    #[Route('/weather', name: 'app_weather', methods: ['POST'])]
     public function getSnow(Request $request, DocumentManager $documentManager): JsonResponse
     {
         // Récupérer le body de la requête POST (attend un JSON contenant 'location')
@@ -23,7 +25,7 @@ class WeatherController extends AbstractController
         $location = $data['location'] ?? null;
 
         if (!$location) {
-            return $this->json(['error' => 'La location est requise.'], 400);
+            return $this->json(['error' => 'La location est requise.'], Response::HTTP_BAD_REQUEST);
         }
 
         $normalizedLocation = strtolower($location);
@@ -32,7 +34,7 @@ class WeatherController extends AbstractController
         $weatherData = $documentManager->getRepository(WeatherForecast::class)->findOneBy(['location' => $normalizedLocation]);
 
         if (!$weatherData) {
-            return $this->json(['error' => "Aucune donnée météo trouvée pour la location $location."], 404);
+            return $this->json(['error' => "Aucune donnée météo trouvée pour la location $location."], Response::HTTP_BAD_REQUEST);
         }
 
         $forecast = $weatherData->getForecasts();
@@ -48,6 +50,17 @@ class WeatherController extends AbstractController
             'date' => $weatherData->getDate(),
             'forecasts' => $forecast
         ]);
+    }
+
+    #[Route('/admin/refresh-weather', name: 'app_refresh_weather', methods: ['GET'])]
+    public function refreshWeather(WeatherApiService $weatherApiService): JsonResponse
+    {
+        try {
+            $weatherApiService->saveWeeklyWeatherForAllLocations();
+            return new JsonResponse(['message' => ['Météo mis à jour avec succès']], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return $this->json(['error' => "La mise à jour de la météo n'a pu être fait: ".$e->getMessage()], Response::HTTP_BAD_REQUEST);
+        }
     }
 }
 

@@ -7,6 +7,7 @@ use App\Repository\SkiLevelRepository;
 use App\Service\SkiDomainDataFetcher;
 use App\Service\SkiDomainDataTransformer;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use MongoDB\BSON\Regex;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -137,15 +138,37 @@ class SkiDomaineDataController extends AbstractController
     }
 
     #[Route('/stations', name: 'app_get_stations', methods: ['GET'])]
-    public function getStationList(DocumentManager $documentManager): JsonResponse
+    public function getStationList(DocumentManager $documentManager, Request $request): JsonResponse
     {
-        $stationRepository = $documentManager->getRepository(Station::class);
-        $stations = $stationRepository->findAll();
+        // Paramètre de recherche "q"
+        $searchTerm = $request->query->get('q', '');
 
+        // Repository par défaut pour la classe Station
+        $stationRepository = $documentManager->getRepository(Station::class);
+
+        if (!empty($searchTerm)) {
+            // Recherche partielle insensible à la casse via un Regex
+            $regex = new Regex($searchTerm, 'i');
+
+            // On construit la requête
+            $stationsCursor = $stationRepository
+                ->createQueryBuilder()
+                ->field('name')->equals($regex)
+                ->getQuery()
+                ->execute();
+
+            // On convertit le cursor en tableau
+            $stations = $stationsCursor->toArray();
+        } else {
+            // Si pas de terme de recherche, on récupère tout
+            $stations = $stationRepository->findAll();
+        }
+
+        // On formate le résultat
         $results = [];
         foreach ($stations as $station) {
             $results[] = [
-                'name' => $station->getName(),
+                'name'  => $station->getName(),
                 'osmId' => $station->getOsmId(),
             ];
         }

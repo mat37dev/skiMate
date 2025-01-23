@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\UsersRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -57,7 +58,10 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     private ?SkiPreference $skiPreference = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $osmId = null;
+    private ?string $skiResortSelected = null;
+
+    #[ORM\Column(type: 'json')]
+    private array $favoriteSkiResorts = [];
 
     public function __construct()
     {
@@ -190,16 +194,39 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getOsmId(): ?string
+    public function getSkiResortSelected(): ?string
     {
-        return $this->osmId;
+        return $this->skiResortSelected;
     }
 
-    public function setOsmId(?string $osmId): static
+    public function setSkiResortSelected(?string $skiResortSelected): static
     {
-        $this->osmId = $osmId;
+        $this->skiResortSelected = $skiResortSelected;
 
         return $this;
     }
 
+    public function getFavoriteSkiResorts(): array
+    {
+        return $this->favoriteSkiResorts;
+    }
+
+    public function addFavoriteSkiResort(string $skiResort): self
+    {
+        if (!in_array($skiResort, $this->favoriteSkiResorts, true)) {
+            $this->favoriteSkiResorts[] = $skiResort;
+        }
+
+        return $this;
+    }
+
+    public function removeFavoriteSkiResort(string $skiResort): self
+    {
+        $this->favoriteSkiResorts = array_filter(
+            $this->favoriteSkiResorts,
+            fn($resort) => $resort !== $skiResort
+        );
+
+        return $this;
+    }
 }

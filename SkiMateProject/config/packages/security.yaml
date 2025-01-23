@@ -2,6 +2,7 @@ security:
     role_hierarchy:
         ROLE_USER: [ROLE_USER]
         ROLE_ADMIN: [ROLE_ADMIN]
+        ROLE_MODERATOR: [ROLE_MODERATOR]
 
     password_hashers:
         App\Entity\User: 'auto'
@@ -43,14 +44,8 @@ security:
                 check_path: /api/token/refresh
 
     access_control:
-        - { path: ^/api/login$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/register$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/forgot-password$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/forgot-password/reset$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/get-ski-domain$, roles: PUBLIC_ACCESS }
-        - { path: ^/api/token/refresh$, roles: PUBLIC_ACCESS }
         - { path: ^/api/admin, roles: ROLE_ADMIN }
-        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api, roles: PUBLIC_ACCESS }
 
 services:
     App\Security\JsonLoginSuccessHandler:

@@ -13,6 +13,8 @@ class SkiDomainDataTransformer
         $station->setOsmId((string)$stationElement['id']);
         $station->setName($stationElement['tags']['name'] ?? 'Station sans nom');
         $station->setTags($stationElement['tags'] ?? []);
+        $station->setWebsite($stationElement['tags']['website'] ?? null);
+        $station->setEmergencyPhone($stationElement['tags']['emergencyPhone'] ?? '');
 
         // Extraire et normaliser la géométrie
         $coords = $this->extractWayGeometry($stationElement, $stationsData);

@@ -175,4 +175,27 @@ class SkiDomaineDataController extends AbstractController
 
         return new JsonResponse($results);
     }
+
+    #[Route('/station/information', name: 'app_get_station_information', methods: ['POST'])]
+    public function getStationInformations(DocumentManager $documentManager, Request $request): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if(!isset($data["osmId"])){
+            return $this->json(['error' => 'Vous devez renseigner une station.'], Response::HTTP_BAD_REQUEST);
+        }
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $station = $stationRepository->findOneBy(['osmId' => $data["osmId"]]);
+        if (empty($station)) {
+            return $this->json(['error' => "La station n'a pas été trouvé."], Response::HTTP_BAD_REQUEST);
+        }
+
+
+        $results = [
+            'name' => $station->getName(),
+            'domain' => $station->getDomain(),
+            'website' => $station->getWebsite(),
+            'emergencyPhone' => $station->getEmergencyPhone(),
+        ];
+        return $this->json($results, 200);
+    }
 }

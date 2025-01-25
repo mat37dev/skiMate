@@ -41,6 +41,12 @@ class Station
     #[ODM\Field(type: "float")]
     private ?float $longitude = null;
 
+    #[ODM\Field(type: "string")]
+    private ?string $website = null;
+
+    #[ODM\Field(type: "string")]
+    private string $emergencyPhone;
+
     // Tableau des items (pistes, remontées, POI...) liés à la station
     // Chaque item sera un tableau associatif similaire à un Feature GeoJSON :
     // {
@@ -159,5 +165,25 @@ class Station
     {
         $this->longitude = $longitude;
         return $this;
+    }
+
+    public function getWebsite(): string
+    {
+        return $this->website;
+    }
+
+    public function setWebsite(string $website): void
+    {
+        $this->website = $website;
+    }
+
+    public function getEmergencyPhone(): string
+    {
+        return $this->emergencyPhone;
+    }
+
+    public function setEmergencyPhone(string $emergencyPhone): void
+    {
+        $this->emergencyPhone = $emergencyPhone;
     }
 }

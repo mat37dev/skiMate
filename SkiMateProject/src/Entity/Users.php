@@ -57,11 +57,8 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne]
     private ?SkiPreference $skiPreference = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $skiResortSelected = null;
-
     #[ORM\Column(type: 'json')]
-    private array $favoriteSkiResorts = [];
+    private ?array $favoriteSkiResorts = null;
 
     public function __construct()
     {
@@ -190,18 +187,6 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSkiPreference(?SkiPreference $skiPreference): static
     {
         $this->skiPreference = $skiPreference;
-
-        return $this;
-    }
-
-    public function getSkiResortSelected(): ?string
-    {
-        return $this->skiResortSelected;
-    }
-
-    public function setSkiResortSelected(?string $skiResortSelected): static
-    {
-        $this->skiResortSelected = $skiResortSelected;
 
         return $this;
     }

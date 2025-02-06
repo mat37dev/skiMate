@@ -3,6 +3,7 @@
 namespace App\Document;
 
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ODM\Document(collection: "stations")]
 class Station
@@ -12,10 +13,12 @@ class Station
 
     // Domaine skiable auquel appartient la station (ex: "Paradiski")
     #[ODM\Field(type: "string")]
+    #[Assert\NotBlank(message: "Le nom du domaine ne peut être vide.")]
     private string $domain;
 
     // Nom de la station (ex: "La Plagne")
     #[ODM\Field(type: "string")]
+    #[Assert\NotBlank(message: "Le nom de la station ne peut être vide.")]
     private string $name;
 
     // Géométrie de la station, sous forme GeoJSON (Polygon)
@@ -36,10 +39,40 @@ class Station
     private string $osmId;
 
     #[ODM\Field(type: "float")]
-    private ?float $latitude = null;
+    #[Assert\NotBlank(message: "La latitude de la station ne peut être vide.")]
+    private float $latitude = 0;
 
     #[ODM\Field(type: "float")]
-    private ?float $longitude = null;
+    #[Assert\NotBlank(message: "La longitude de la station ne peut être vide.")]
+    private float $longitude = 0;
+
+    #[ODM\Field(type: "string")]
+    private ?string $website = '';
+
+    #[ODM\Field(type: "string")]
+    private string $emergencyPhone = '';
+
+    #[ODM\Field(type: "string")]
+    private string $altitudeMin = '';
+
+    #[ODM\Field(type: "string")]
+    private string $altitudeMax = '';
+
+    #[ODM\Field(type: "string")]
+    private string $distanceSlope = '';
+
+    #[ODM\Field(type: "string")]
+    private string $countEasy = '';
+
+    #[ODM\Field(type: "string")]
+    private string $countIntermediate = '';
+
+    #[ODM\Field(type: "string")]
+    private string $countAdvanced = '';
+
+    #[ODM\Field(type: "string")]
+    private string $countExpert = '';
+
 
     // Tableau des items (pistes, remontées, POI...) liés à la station
     // Chaque item sera un tableau associatif similaire à un Feature GeoJSON :
@@ -57,9 +90,20 @@ class Station
     #[ODM\Field(type: "collection")]
     private $features = [];
 
-    public function getId(): ?string
+    /**
+     * @return mixed
+     */
+    public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @param mixed $id
+     */
+    public function setId($id): void
+    {
+        $this->id = $id;
     }
 
     public function getDomain(): string
@@ -67,10 +111,9 @@ class Station
         return $this->domain;
     }
 
-    public function setDomain(string $domain): self
+    public function setDomain(string $domain): void
     {
         $this->domain = $domain;
-        return $this;
     }
 
     public function getName(): string
@@ -78,10 +121,9 @@ class Station
         return $this->name;
     }
 
-    public function setName(string $name): self
+    public function setName(string $name): void
     {
         $this->name = $name;
-        return $this;
     }
 
     public function getGeometry(): array
@@ -89,10 +131,9 @@ class Station
         return $this->geometry;
     }
 
-    public function setGeometry(array $geometry): self
+    public function setGeometry(array $geometry): void
     {
         $this->geometry = $geometry;
-        return $this;
     }
 
     public function getTags(): array
@@ -100,10 +141,9 @@ class Station
         return $this->tags;
     }
 
-    public function setTags(array $tags): self
+    public function setTags(array $tags): void
     {
         $this->tags = $tags;
-        return $this;
     }
 
     public function isValidated(): bool
@@ -111,10 +151,9 @@ class Station
         return $this->validated;
     }
 
-    public function setValidated(bool $validated): self
+    public function setValidated(bool $validated): void
     {
         $this->validated = $validated;
-        return $this;
     }
 
     public function getOsmId(): string
@@ -122,10 +161,119 @@ class Station
         return $this->osmId;
     }
 
-    public function setOsmId(string $osmId): self
+    public function setOsmId(string $osmId): void
     {
         $this->osmId = $osmId;
-        return $this;
+    }
+
+    public function getLatitude(): float
+    {
+        return $this->latitude;
+    }
+
+    public function setLatitude(float $latitude): void
+    {
+        $this->latitude = $latitude;
+    }
+
+    public function getLongitude(): float
+    {
+        return $this->longitude;
+    }
+
+    public function setLongitude(float $longitude): void
+    {
+        $this->longitude = $longitude;
+    }
+
+    public function getWebsite(): ?string
+    {
+        return $this->website;
+    }
+
+    public function setWebsite(?string $website): void
+    {
+        $this->website = $website;
+    }
+
+    public function getEmergencyPhone(): string
+    {
+        return $this->emergencyPhone;
+    }
+
+    public function setEmergencyPhone(string $emergencyPhone): void
+    {
+        $this->emergencyPhone = $emergencyPhone;
+    }
+
+    public function getAltitudeMin(): string
+    {
+        return $this->altitudeMin;
+    }
+
+    public function setAltitudeMin(string $altitudeMin): void
+    {
+        $this->altitudeMin = $altitudeMin;
+    }
+
+    public function getAltitudeMax(): string
+    {
+        return $this->altitudeMax;
+    }
+
+    public function setAltitudeMax(string $altitudeMax): void
+    {
+        $this->altitudeMax = $altitudeMax;
+    }
+
+    public function getDistanceSlope(): string
+    {
+        return $this->distanceSlope;
+    }
+
+    public function setDistanceSlope(string $distanceSlope): void
+    {
+        $this->distanceSlope = $distanceSlope;
+    }
+
+    public function getCountEasy(): string
+    {
+        return $this->countEasy;
+    }
+
+    public function setCountEasy(string $countEasy): void
+    {
+        $this->countEasy = $countEasy;
+    }
+
+    public function getCountIntermediate(): string
+    {
+        return $this->countIntermediate;
+    }
+
+    public function setCountIntermediate(string $countIntermediate): void
+    {
+        $this->countIntermediate = $countIntermediate;
+    }
+
+    public function getCountAdvanced(): string
+    {
+        return $this->countAdvanced;
+    }
+
+    public function setCountAdvanced(string $countAdvanced): void
+    {
+        $this->countAdvanced = $countAdvanced;
+    }
+
+    public function getCountExpert(): string
+    {
+        return $this->countExpert;
+    }
+
+    public function setCountExpert(string $countExpert): void
+    {
+        $this->countExpert = $countExpert;
     }
 
     public function getFeatures(): array
@@ -133,31 +281,10 @@ class Station
         return $this->features;
     }
 
-    public function setFeatures(array $features): self
+    public function setFeatures(array $features): void
     {
         $this->features = $features;
-        return $this;
     }
 
-    public function getLatitude(): ?float
-    {
-        return $this->latitude;
-    }
 
-    public function setLatitude(?float $latitude): self
-    {
-        $this->latitude = $latitude;
-        return $this;
-    }
-
-    public function getLongitude(): ?float
-    {
-        return $this->longitude;
-    }
-
-    public function setLongitude(?float $longitude): self
-    {
-        $this->longitude = $longitude;
-        return $this;
-    }
 }

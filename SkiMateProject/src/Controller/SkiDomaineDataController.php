@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Document\Station;
-use App\Repository\SkiLevelRepository;
 use App\Service\SkiDomainDataFetcher;
 use App\Service\SkiDomainDataTransformer;
 use Doctrine\ODM\MongoDB\DocumentManager;
@@ -13,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api')]
 class SkiDomaineDataController extends AbstractController
@@ -28,12 +28,11 @@ class SkiDomaineDataController extends AbstractController
         $domainName = $requestData['domaine'] ?? null;
 
         if (!$domainName) {
-            return $this->json(['error' => 'Le champ "domaine" est requis.'], 400);
+            return $this->json(['errors' => 'Le champ "domaine" est requis.'], 400);
         }
 
         $stationsData = $domainDataFetcher->fetchStationsForDomain($domainName);
         $imported = [];
-        $featuresData = null;
 
         foreach ($stationsData['elements'] as $stationElement) {
             if ($stationElement['type'] === 'way') {
@@ -68,6 +67,7 @@ class SkiDomaineDataController extends AbstractController
 
                     $station->setLongitude($long);
                     $station->setLatitude($lat);
+
                     // Mettre à jour la station avec ses features
                     $documentManager->persist($station);
                     $documentManager->flush();
@@ -84,7 +84,81 @@ class SkiDomaineDataController extends AbstractController
 
         return $this->json([
             'message' => 'Import terminé',
-            'stations_importées' => $imported,
+            'stations_importees' => $imported,
+            'last_features_data' => $featureCollection
+        ]);
+    }
+
+    #[Route('/admin/skiResort-data', name: 'app_admin_skiResort_data', methods: ['POST'])]
+    public function getSkiResortData(Request $request, SkiDomainDataFetcher $domainDataFetcher,
+                                     SkiDomainDataTransformer $transformer, DocumentManager $documentManager): Response
+    {
+        $requestData = json_decode($request->getContent(), true);
+        $skiResortName = $requestData['skiResort'] ?? null;
+
+        if (!$skiResortName) {
+            return $this->json(['errors' => 'Le champ "skiResort" est requis.'], 400);
+        }
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $station = $stationRepository->findOneBy(['name' => $skiResortName]);
+        if($station){
+            return $this->json(['errors' => 'Une station porte déjà ce nom.'], 400);
+        }
+
+        $stationsData = $domainDataFetcher->fetchStationsForDomain($skiResortName);
+        $imported = [];
+
+        foreach ($stationsData['elements'] as $stationElement) {
+            if ($stationElement['type'] === 'way') {
+                $stationName = $stationElement['tags']['name'] ?? null;
+                if ($stationName == $skiResortName) {
+                    $wayId = $stationElement['id'];
+                    $lat = $stationElement['center']['lat'] ?? null;
+                    $long = $stationElement['center']['lon'] ?? null;
+
+                    // Transformer la station
+                    $station = $transformer->transformStation($skiResortName, $stationElement, $stationsData);
+
+                    // Vérifier si cette station existe déjà
+                    $existingStation = $documentManager->getRepository(Station::class)
+                        ->findOneBy(['osmId' => $station->getOsmId()]);
+
+                    if ($existingStation) {
+                        $documentManager->remove($existingStation);
+                        $documentManager->flush();
+                    }
+
+                    // Persister la station "vide"
+                    $documentManager->persist($station);
+                    $documentManager->flush();
+
+                    // Récupérer les features pour cette station
+                    $featuresData = $domainDataFetcher->fetchFeaturesForStation($wayId);
+
+                    // Transformer les features en Features GeoJSON
+                    $features = $transformer->transformAllFeatures($featuresData);
+                    $station->setFeatures($features);
+
+                    $station->setLongitude($long);
+                    $station->setLatitude($lat);
+
+                    // Mettre à jour la station avec ses features
+                    $documentManager->persist($station);
+                    $documentManager->flush();
+
+                    $imported[] = $station->getName();
+                }
+            }
+        }
+
+        $featureCollection = [
+            "type" => "FeatureCollection",
+            "features" => $features ?? []
+        ];
+
+        return $this->json([
+            'message' => 'Import terminé',
+            'stations_importees' => $imported,
             'last_features_data' => $featureCollection
         ]);
     }
@@ -191,11 +265,119 @@ class SkiDomaineDataController extends AbstractController
 
 
         $results = [
+            'osmId' => $station->getOsmId(),
             'name' => $station->getName(),
             'domain' => $station->getDomain(),
             'website' => $station->getWebsite(),
             'emergencyPhone' => $station->getEmergencyPhone(),
+            'altitudeMin'=> $station->getAltitudeMin(),
+            'altitudeMax'=> $station->getAltitudeMax(),
+            'latitude'=> $station->getLatitude(),
+            'longitude'=> $station->getLongitude(),
+            'distanceSlope'=> $station->getDistanceSlope(),
+            'countEasy'=> $station->getCountEasy(),
+            'countIntermediate'=> $station->getCountIntermediate(),
+            'countAdvanced'=> $station->getCountAdvanced(),
+            'countExpert'=> $station->getCountExpert(),
         ];
         return $this->json($results, 200);
+    }
+
+    #[Route('/admin/edit/station', name: 'app_edit_station', methods: ['POST'])]
+    public function editStation(Request $request, DocumentManager $documentManager, ValidatorInterface $validator): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if(!isset($data["osmId"])){
+            return $this->json(['error' => "Vous devez renseigner le osmId."], Response::HTTP_BAD_REQUEST);
+        }
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $station = $stationRepository->findOneBy(['osmId' => $data["osmId"]]);
+        if (empty($station)) {
+            return $this->json(['error' => "La station n'a pas été trouvé."], Response::HTTP_BAD_REQUEST);
+        }
+
+        if(isset($data["name"])){
+            $station->setName($data["name"]);
+        }
+        else{
+            return $this->json(['error' => "Vous devez fournir un nom de station."], Response::HTTP_BAD_REQUEST);
+        }
+        if(isset($data["domain"]))
+        {
+            $station->setDomain($data["domain"]);
+        }
+        else{
+            return $this->json(['error' => "Vous devez fournir un nom de domaine."], Response::HTTP_BAD_REQUEST);
+        }
+        if(isset($data["website"])){
+            $station->setWebsite($data["website"]);
+        }
+        if(isset($data["emergencyPhone"])){
+            $station->setEmergencyPhone($data["emergencyPhone"]);
+        }
+        if(isset($data["altitudeMin"])){
+            $station->setAltitudeMin($data["altitudeMin"]);
+        }
+        if(isset($data["altitudeMax"])){
+            $station->setAltitudeMax($data["altitudeMax"]);
+        }
+        if(isset($data["latitude"])){
+            $station->setLatitude($data["latitude"]);
+        }
+        else{
+            return $this->json(['error' => "Vous devez fournir la latitude de la station."], Response::HTTP_BAD_REQUEST);
+        }
+        if(isset($data["longitude"])){
+            $station->setLongitude($data["longitude"]);
+        }
+        else{
+            return $this->json(['error' => "Vous devez fournir la longitude de la station."], Response::HTTP_BAD_REQUEST);
+        }
+        if(isset($data["distanceSlope"])){
+            $station->setDistanceSlope($data["distanceSlope"]);
+        }
+        if(isset($data["countEasy"])){
+            $station->setCountEasy($data["countEasy"]);
+        }
+        if(isset($data["countIntermediate"])){
+            $station->setCountIntermediate($data["countIntermediate"]);
+        }
+        if(isset($data["countAdvanced"])){
+            $station->setCountAdvanced($data["countAdvanced"]);
+        }
+        if(isset($data["countExpert"])){
+            $station->setCountExpert($data["countExpert"]);
+        }
+
+        $errors = $validator->validate($station);
+        if (count($errors) > 0) {
+            $errorsArray = [];
+            foreach ($errors as $error) {
+                $errorsArray[$error->getPropertyPath()] = $error->getMessage();
+            }
+            return $this->json(['errors' => $errorsArray], Response::HTTP_BAD_REQUEST);
+        }
+
+        $documentManager->persist($station);
+        $documentManager->flush();
+
+        return new JsonResponse(['message' => 'Station mise à jour avec succès'], Response::HTTP_OK);
+    }
+
+    #[Route('/admin/delete/station', name: 'app_delete_station', methods: ['POST'])]
+    public function deleteStation(Request $request, DocumentManager $documentManager, ValidatorInterface $validator): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if(!isset($data["osmId"])){
+            return $this->json(['error' => "Vous devez renseigner le osmId."], Response::HTTP_BAD_REQUEST);
+        }
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $station = $stationRepository->findOneBy(['osmId' => $data["osmId"]]);
+        if (empty($station)) {
+            return $this->json(['error' => "La station n'a pas été trouvé."], Response::HTTP_BAD_REQUEST);
+        }
+        $documentManager->remove($station);
+        $documentManager->flush();
+        return new JsonResponse(['message' => 'Station supprimé avec succès'], Response::HTTP_OK);
     }
 }

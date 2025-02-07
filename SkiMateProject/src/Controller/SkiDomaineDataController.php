@@ -214,31 +214,33 @@ class SkiDomaineDataController extends AbstractController
     #[Route('/stations', name: 'app_get_stations', methods: ['GET'])]
     public function getStationList(DocumentManager $documentManager, Request $request): JsonResponse
     {
-        // Paramètre de recherche "q"
+        // Récupération des paramètres de recherche
         $searchTerm = $request->query->get('q', '');
+        $domainTerm = $request->query->get('domain', ''); // optionnel
 
-        // Repository par défaut pour la classe Station
+        // Accès au repository
         $stationRepository = $documentManager->getRepository(Station::class);
 
+        // Création du query builder
+        $qb = $stationRepository->createQueryBuilder();
+
+        // Si un terme de recherche est fourni, appliquer un filtre sur le nom (insensible à la casse)
         if (!empty($searchTerm)) {
-            // Recherche partielle insensible à la casse via un Regex
             $regex = new Regex($searchTerm, 'i');
-
-            // On construit la requête
-            $stationsCursor = $stationRepository
-                ->createQueryBuilder()
-                ->field('name')->equals($regex)
-                ->getQuery()
-                ->execute();
-
-            // On convertit le cursor en tableau
-            $stations = $stationsCursor->toArray();
-        } else {
-            // Si pas de terme de recherche, on récupère tout
-            $stations = $stationRepository->findAll();
+            $qb->field('name')->equals($regex);
         }
 
-        // On formate le résultat
+        // Si un domaine est fourni, on filtre sur le champ 'domain'
+        if (!empty($domainTerm)) {
+            // On peut par exemple convertir le domaine en minuscules pour être cohérent
+            $qb->field('domain')->equals($domainTerm);
+        }
+
+        // Exécution de la requête
+        $stationsCursor = $qb->getQuery()->execute();
+        $stations = $stationsCursor->toArray();
+
+        // Formattage du résultat
         $results = [];
         foreach ($stations as $station) {
             $results[] = [
@@ -365,7 +367,7 @@ class SkiDomaineDataController extends AbstractController
     }
 
     #[Route('/admin/delete/station', name: 'app_delete_station', methods: ['POST'])]
-    public function deleteStation(Request $request, DocumentManager $documentManager, ValidatorInterface $validator): JsonResponse
+    public function deleteStation(Request $request, DocumentManager $documentManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         if(!isset($data["osmId"])){

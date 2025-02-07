@@ -13,11 +13,11 @@ class SkiFixtures extends Fixture implements FixtureGroupInterface, OrderedFixtu
 
     public function getOrder(): int
     {
-        return 2;
+        return 1;
     }
     public function load(ObjectManager $manager): void
     {
-        $preferenceType = ["Piste", "Hors Piste", "Snow Park"];
+        $preferenceType = ["piste", "hors-piste", "snow park", "freestyle"];
 
         foreach ($preferenceType as $preference) {
             $skiPreference = new SkiPreference();

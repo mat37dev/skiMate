@@ -27,7 +27,7 @@ class RegisterController extends AbstractController
             return new JsonResponse(['errors'=>'les mots de passe ne correspondent pas'], Response::HTTP_BAD_REQUEST);
         }
         else if(!$this->isPasswordValid($password)) {
-            return new JsonResponse(['message' => 'Le mot de passe doit contenir au moins 8 caractères, 
+            return new JsonResponse(['errors' => 'Le mot de passe doit contenir au moins 8 caractères, 
             une majuscule, une minuscule, un chiffre et un caractère spécial (@$!%*?&_).'], Response::HTTP_BAD_REQUEST);
         }
 

@@ -57,7 +57,7 @@ class Users implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne]
     private ?SkiPreference $skiPreference = null;
 
-    #[ORM\Column(type: 'json')]
+    #[ORM\Column(type: 'json', nullable: true)]
     private ?array $favoriteSkiResorts = null;
 
     public function __construct()

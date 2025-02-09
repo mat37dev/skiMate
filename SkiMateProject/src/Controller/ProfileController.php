@@ -46,15 +46,15 @@ class ProfileController extends AbstractController
         unset($userSerialize['password']);
         unset($userSerialize['userIdentifier']);
 
-        $osmId = $user->getOsmId();
+//        $osmId = $user->getOsmId();
         $stationName = null;
-        if ($osmId) {
-            $stationRepo = $documentManager->getRepository(Station::class);
-            $station = $stationRepo->findOneBy(['osmId' => $osmId]);
-            if ($station) {
-                $stationName = $station->getName();
-            }
-        }
+//        if ($osmId) {
+//            $stationRepo = $documentManager->getRepository(Station::class);
+//            $station = $stationRepo->findOneBy(['osmId' => $osmId]);
+//            if ($station) {
+//                $stationName = $station->getName();
+//            }
+//        }
         $userData = [
             "user" => $userSerialize,
             "sessions" => json_decode($serializer->serialize($sessions, 'json'), true),
@@ -165,20 +165,20 @@ class ProfileController extends AbstractController
             $user->setPhoneNumber($phoneNumber);
         }
 
-        $skiLevelId = $data['skiLevel'] ?? null;
-        if ($skiLevelId !== null) {
-            $skiLevel = $skiLevelRepository->findOneBy(["id"=>$skiLevelId]);
+        $skiLevel = $data['skiLevel'] ?? null;
+        if ($skiLevel !== null) {
+            $skiLevel = $skiLevelRepository->findOneBy(["name"=>$skiLevel]);
             if (!$skiLevel) {
-                return $this->json(['error' => 'SkiLevel invalide.'], 400);
+                return $this->json(['error' => 'niveau invalide.'], 400);
             }
             $user->setSkiLevel($skiLevel);
         }
 
-        $skiPreferenceId = $data['skiPreference'] ?? null;
-        if ($skiPreferenceId !== null) {
-            $skiPreference = $skiPreferenceRepository->findOneBy(["id"=>$skiPreferenceId]);
+        $skiPreference= $data['skiPreference'] ?? null;
+        if ($skiPreference !== null) {
+            $skiPreference = $skiPreferenceRepository->findOneBy(["name"=>$skiPreference]);
             if (!$skiPreference) {
-                return $this->json(['error' => 'SkiPreference invalide.'], 400);
+                return $this->json(['error' => 'preference invalide.'], 400);
             }
             $user->setSkiPreference($skiPreference);
         }
@@ -214,7 +214,7 @@ class ProfileController extends AbstractController
                 'phoneNumber' => $user->getPhoneNumber(),
                 'skiLevel' => $user->getSkiLevel()?->getName(),
                 'skiPreference' => $user->getSkiPreference()?->getName(),
-                'osmId' => $user->getOsmId(),
+//                'osmId' => $user->getOsmId(),
             ]
         ]);
     }
@@ -237,7 +237,7 @@ class ProfileController extends AbstractController
             'user' => [
                 'id' => $user->getId(),
                 'email' => $user->getEmail(),
-                'osmId' => $user->getOsmId(), // désormais null
+//                'osmId' => $user->getOsmId(), // désormais null
             ]
         ]);
     }

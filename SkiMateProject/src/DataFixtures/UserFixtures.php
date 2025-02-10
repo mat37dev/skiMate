@@ -2,10 +2,11 @@
 
 namespace App\DataFixtures;
 
-
 use App\Entity\Roles;
 use App\Entity\Session;
 use App\Entity\Users;
+use App\Repository\SkiLevelRepository;
+use App\Repository\SkiPreferenceRepository;
 use App\Repository\UsersRepository;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
@@ -13,16 +14,21 @@ use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Doctrine\Bundle\FixturesBundle\FixtureGroupInterface;
+
 class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGroupInterface
 {
-    public function __construct(private readonly UserPasswordHasherInterface $passwordHasher, UsersRepository $usersRepository)
-    {
-    }
+    public function __construct(
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private UsersRepository $usersRepository,
+        private SkiLevelRepository $skiLevelRepository,
+        private SkiPreferenceRepository $skiPreferenceRepository
+    ) {}
 
     public function getOrder(): int
     {
-        return 1;
+        return 2;
     }
+
     public function load(ObjectManager $manager): void
     {
         $faker = Factory::create('fr_FR');
@@ -40,16 +46,16 @@ class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGr
             $user->setFirstname($faker->firstName());
             $user->setLastname($faker->lastName());
             $user->setEmail($faker->email());
-            $password = $faker->password();
+            $password = '123';
             $hashedPassword = $this->passwordHasher->hashPassword($user, $password);
             $user->setPassword($hashedPassword);
             $user->setPhoneNumber($faker->phoneNumber());
             $user->addRole($roleUser);
+            $user->setSkiLevel($this->skiLevelRepository->findOneBy(["name" => "vert"]));
+            $user->setSkiPreference($this->skiPreferenceRepository->findOneBy(["name" => "piste"]));
 
             $manager->persist($user);
-            $manager->flush();
-    }
-
+        }
 
         $user = new Users();
         $user->setFirstname("Mathieu");
@@ -60,6 +66,8 @@ class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGr
         $user->setPassword($hashedPassword);
         $user->setPhoneNumber($faker->phoneNumber());
         $user->addRole($roleAdmin);
+        $user->setSkiLevel($this->skiLevelRepository->findOneBy(["name" => "vert"]));
+        $user->setSkiPreference($this->skiPreferenceRepository->findOneBy(["name" => "piste"]));
 
         $manager->persist($user);
 
@@ -78,6 +86,7 @@ class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGr
         $manager->persist($session1);
         $manager->persist($session2);
 
+
         $manager->flush();
     }
 
@@ -85,5 +94,4 @@ class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGr
     {
         return ['user'];
     }
-
 }

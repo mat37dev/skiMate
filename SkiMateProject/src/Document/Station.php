@@ -73,6 +73,9 @@ class Station
     #[ODM\Field(type: "string")]
     private string $countExpert = '';
 
+    #[ODM\Field(type: "string")]
+    private string $logo = '';
+
 
     // Tableau des items (pistes, remontées, POI...) liés à la station
     // Chaque item sera un tableau associatif similaire à un Feature GeoJSON :
@@ -286,5 +289,14 @@ class Station
         $this->features = $features;
     }
 
+    public function getLogo(): string
+    {
+        return $this->logo;
+    }
+
+    public function setLogo(string $logo): void
+    {
+        $this->logo = $logo;
+    }
 
 }

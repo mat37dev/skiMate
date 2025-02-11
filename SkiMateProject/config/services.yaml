@@ -6,6 +6,7 @@
 parameters:
     env(MONGODB_URL): ''
     env(MONGODB_DB): ''
+    logo_upload_directory: '%kernel.project_dir%/public/uploads/logos'
 
 services:
     # default configuration for services in *this* file

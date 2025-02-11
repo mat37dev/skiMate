@@ -8,6 +8,7 @@ use App\Service\SkiDomainDataTransformer;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use MongoDB\BSON\Regex;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -214,36 +215,39 @@ class SkiDomaineDataController extends AbstractController
     #[Route('/stations', name: 'app_get_stations', methods: ['GET'])]
     public function getStationList(DocumentManager $documentManager, Request $request): JsonResponse
     {
-        // Paramètre de recherche "q"
+        // Récupération des paramètres de recherche
         $searchTerm = $request->query->get('q', '');
+        $domainTerm = $request->query->get('domain', ''); // optionnel
 
-        // Repository par défaut pour la classe Station
+        // Accès au repository
         $stationRepository = $documentManager->getRepository(Station::class);
 
+        // Création du query builder
+        $qb = $stationRepository->createQueryBuilder();
+
+        // Si un terme de recherche est fourni, appliquer un filtre sur le nom (insensible à la casse)
         if (!empty($searchTerm)) {
-            // Recherche partielle insensible à la casse via un Regex
             $regex = new Regex($searchTerm, 'i');
-
-            // On construit la requête
-            $stationsCursor = $stationRepository
-                ->createQueryBuilder()
-                ->field('name')->equals($regex)
-                ->getQuery()
-                ->execute();
-
-            // On convertit le cursor en tableau
-            $stations = $stationsCursor->toArray();
-        } else {
-            // Si pas de terme de recherche, on récupère tout
-            $stations = $stationRepository->findAll();
+            $qb->field('name')->equals($regex);
         }
 
-        // On formate le résultat
+        // Si un domaine est fourni, on filtre sur le champ 'domain'
+        if (!empty($domainTerm)) {
+            // On peut par exemple convertir le domaine en minuscules pour être cohérent
+            $qb->field('domain')->equals($domainTerm);
+        }
+
+        // Exécution de la requête
+        $stationsCursor = $qb->getQuery()->execute();
+        $stations = $stationsCursor->toArray();
+
+        // Formattage du résultat
         $results = [];
         foreach ($stations as $station) {
             $results[] = [
                 'name'  => $station->getName(),
                 'osmId' => $station->getOsmId(),
+                'logo'=> $station->getLogo(),
             ];
         }
 
@@ -279,6 +283,7 @@ class SkiDomaineDataController extends AbstractController
             'countIntermediate'=> $station->getCountIntermediate(),
             'countAdvanced'=> $station->getCountAdvanced(),
             'countExpert'=> $station->getCountExpert(),
+            'logo'=> $station->getLogo()
         ];
         return $this->json($results, 200);
     }
@@ -365,7 +370,7 @@ class SkiDomaineDataController extends AbstractController
     }
 
     #[Route('/admin/delete/station', name: 'app_delete_station', methods: ['POST'])]
-    public function deleteStation(Request $request, DocumentManager $documentManager, ValidatorInterface $validator): JsonResponse
+    public function deleteStation(Request $request, DocumentManager $documentManager): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
         if(!isset($data["osmId"])){
@@ -379,5 +384,55 @@ class SkiDomaineDataController extends AbstractController
         $documentManager->remove($station);
         $documentManager->flush();
         return new JsonResponse(['message' => 'Station supprimé avec succès'], Response::HTTP_OK);
+    }
+
+    #[Route('/admin/upload/logo', name: 'app_upload_logo', methods: ['POST'])]
+    public function uploadLogo(Request $request, DocumentManager $documentManager): JsonResponse
+    {
+        // Récupérer le fichier envoyé dans le champ "logo"
+        $file = $request->files->get('logo');
+        $osmId = $request->request->get('osmId');
+
+        if (!$file) {
+            return new JsonResponse(['error' => 'Aucun fichier n\'a été téléchargé.'], Response::HTTP_BAD_REQUEST);
+        }
+        if(!$osmId){
+            return $this->json(['error' => "Vous devez renseigner le osmId."], Response::HTTP_BAD_REQUEST);
+        }
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $station = $stationRepository->findOneBy(['osmId' => $osmId]);
+        if (empty($station)) {
+            return $this->json(['error' => "La station n'a pas été trouvé."], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Valider que le fichier est bien une image (optionnel mais recommandé)
+        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
+            return new JsonResponse(['error' => 'Type de fichier non autorisé.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Générer un nom de fichier sûr
+        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        // Utiliser transliterator_transliterate pour convertir en ASCII, supprimer les caractères spéciaux, et mettre en minuscules
+        $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
+        $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
+
+        // Déplacer le fichier dans le répertoire de destination
+        try {
+            $file->move($this->getParameter('logo_upload_directory'), $newFilename);
+        } catch (FileException $e) {
+            return new JsonResponse(['error' => 'Erreur lors du téléchargement du fichier.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        // Construire l'URL relative du logo (à adapter selon votre configuration)
+        $logoUrl = '/uploads/logos/' . $newFilename;
+        $station->setLogo($logoUrl);
+        $documentManager->persist($station);
+        $documentManager->flush();
+
+        return new JsonResponse([
+            'message' => 'Logo enregistré avec succès.',
+            'logoUrl' => $logoUrl,
+        ], Response::HTTP_OK);
     }
 }

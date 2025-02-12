@@ -7,7 +7,9 @@ use App\Service\SkiDomainDataFetcher;
 use App\Service\SkiDomainDataTransformer;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use MongoDB\BSON\Regex;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,6 +20,18 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api')]
 class SkiDomaineDataController extends AbstractController
 {
+
+    private LoggerInterface $logger;
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+
     #[Route('/admin/domaine-data', name: 'app_admin_domaine_data', methods: ['POST'])]
     public function index(
         Request $request,
@@ -396,13 +410,14 @@ class SkiDomaineDataController extends AbstractController
         if (!$file) {
             return new JsonResponse(['error' => 'Aucun fichier n\'a été téléchargé.'], Response::HTTP_BAD_REQUEST);
         }
-        if(!$osmId){
-            return $this->json(['error' => "Vous devez renseigner le osmId."], Response::HTTP_BAD_REQUEST);
+        if (!$osmId) {
+            return new JsonResponse(['error' => "Vous devez renseigner le osmId."], Response::HTTP_BAD_REQUEST);
         }
+
         $stationRepository = $documentManager->getRepository(Station::class);
         $station = $stationRepository->findOneBy(['osmId' => $osmId]);
-        if (empty($station)) {
-            return $this->json(['error' => "La station n'a pas été trouvé."], Response::HTTP_BAD_REQUEST);
+        if (!$station) {
+            return new JsonResponse(['error' => "La station n'a pas été trouvée."], Response::HTTP_BAD_REQUEST);
         }
 
         // Valider que le fichier est bien une image (optionnel mais recommandé)
@@ -411,9 +426,28 @@ class SkiDomaineDataController extends AbstractController
             return new JsonResponse(['error' => 'Type de fichier non autorisé.'], Response::HTTP_BAD_REQUEST);
         }
 
+        // Supprimer l'ancienne image si elle existe
+        $oldLogoUrl = $station->getLogo();
+        if ($oldLogoUrl) {
+            // Récupérer le répertoire d'upload à partir des paramètres
+            $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/logos';
+            // On extrait le nom du fichier depuis l'URL (par exemple, "logo123.png")
+            $oldFilename = basename($oldLogoUrl);
+            $oldFilePath = $uploadDir . DIRECTORY_SEPARATOR . $oldFilename;
+            $filesystem = new Filesystem();
+            if ($filesystem->exists($oldFilePath)) {
+                try {
+                    $filesystem->remove($oldFilePath);
+                    $this->logger->info("Ancien logo supprimé : $oldFilePath");
+                } catch (FileException $e) {
+                    // Vous pouvez loguer l'erreur mais continuer l'upload si nécessaire
+                    $this->logger->error("Erreur lors de la suppression de l'ancien logo : " . $e->getMessage());
+                }
+            }
+        }
+
         // Générer un nom de fichier sûr
         $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        // Utiliser transliterator_transliterate pour convertir en ASCII, supprimer les caractères spéciaux, et mettre en minuscules
         $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
         $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
 
@@ -424,7 +458,7 @@ class SkiDomaineDataController extends AbstractController
             return new JsonResponse(['error' => 'Erreur lors du téléchargement du fichier.'], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
-        // Construire l'URL relative du logo (à adapter selon votre configuration)
+        // Construire l'URL relative du logo
         $logoUrl = '/uploads/logos/' . $newFilename;
         $station->setLogo($logoUrl);
         $documentManager->persist($station);

@@ -1,14 +1,11 @@
 <?php
-
 namespace App\Controller;
-
 
 use App\Document\Snowfall;
 use App\Document\WeatherForecast;
 use App\Service\WeatherApiService;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

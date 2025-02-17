@@ -20,17 +20,20 @@ class Comment
     #[ORM\Column(length: 255)]
     private ?string $description = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $entityType = null;
-
     #[ORM\Column]
-    private ?int $entityId = null;
+    private ?string $osmId = null;
 
     #[ORM\ManyToOne]
-    private ?Users $users = null;
+    private ?Users $user = null;
 
     #[ORM\Column(nullable: true)]
     private ?int $note = null;
+
+    #[ORM\Column(nullable: false)]
+    private bool $isValide = true;
+
+    #[ORM\Column(nullable: false)]
+    private \DateTimeImmutable $createdAt;
 
     public function getId(): ?string
     {
@@ -61,38 +64,14 @@ class Comment
         return $this;
     }
 
-    public function getEntityType(): ?string
+    public function getUser(): ?Users
     {
-        return $this->entityType;
+        return $this->user;
     }
 
-    public function setEntityType(string $entityType): static
+    public function setUser(?Users $user): static
     {
-        $this->entityType = $entityType;
-
-        return $this;
-    }
-
-    public function getEntityId(): ?int
-    {
-        return $this->entityId;
-    }
-
-    public function setEntityId(int $entityId): static
-    {
-        $this->entityId = $entityId;
-
-        return $this;
-    }
-
-    public function getUsers(): ?Users
-    {
-        return $this->users;
-    }
-
-    public function setUsers(?Users $users): static
-    {
-        $this->users = $users;
+        $this->user = $user;
 
         return $this;
     }
@@ -107,5 +86,35 @@ class Comment
         $this->note = $note;
 
         return $this;
+    }
+
+    public function getOsmId(): ?string
+    {
+        return $this->osmId;
+    }
+
+    public function setOsmId(?string $osmId): void
+    {
+        $this->osmId = $osmId;
+    }
+
+    public function isValide(): bool
+    {
+        return $this->isValide;
+    }
+
+    public function setIsValide(bool $isValide): void
+    {
+        $this->isValide = $isValide;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }

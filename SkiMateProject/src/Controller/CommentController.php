@@ -21,7 +21,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api')]
 class CommentController extends AbstractController
 {
-    #[Route('/comment', name: 'app_comment', methods: ['POST'])]
+    #[Route('/comments', name: 'app_comments', methods: ['POST'])]
     public function getComment(Request $request, CommentRepository $commentRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -105,7 +105,7 @@ class CommentController extends AbstractController
         return new JsonResponse(['message' => 'Le commentaire a bien été supprimé.'], Response::HTTP_OK);
     }
 
-    #[Route('/admin/comment', name: 'app_admin_comment', methods: ['GET'])]
+    #[Route('/admin/comments', name: 'app_admin_comments', methods: ['GET'])]
     public function getAllComments(CommentRepository $commentRepository): JsonResponse
     {
        $comments = $commentRepository->findAll();
@@ -128,5 +128,4 @@ class CommentController extends AbstractController
         $commentRepository->save($comment);
         return new JsonResponse(['message' => 'Le commentaire a bien été désactivé.'], Response::HTTP_OK);
     }
-
 }

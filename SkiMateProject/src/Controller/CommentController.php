@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Controller;
-
 
 use App\Document\Station;
 use App\Entity\Comment;
@@ -16,28 +14,45 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 #[Route('/api')]
 class CommentController extends AbstractController
 {
     #[Route('/comments', name: 'app_comments', methods: ['POST'])]
-    public function getComment(Request $request, CommentRepository $commentRepository): JsonResponse
-    {
+    public function getComment(
+        Request $request,
+        CommentRepository $commentRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
         $data = json_decode($request->getContent(), true);
         if (!isset($data['osmId'])) {
             return new JsonResponse(['message' => 'Station de ski non renseigné'], Response::HTTP_BAD_REQUEST);
         }
 
-        $comments = $commentRepository->findBy(['osmId' => $data['osmId']]);
+        $comments = $commentRepository->findBy([
+            'osmId' => $data['osmId'],
+            'isValide' => true
+        ]);
 
-        return new JsonResponse($comments);
+        $results = [];
+        foreach ($comments as $comment) {
+            $user = $comment->getUser();
+            $results[] = [
+                'id'          => $comment->getId(),
+                'title'       => $comment->getTitle(),
+                'description' => $comment->getDescription(),
+                'note'        => $comment->getNote(),
+                'user' => [
+                    'firstname' => $user?->getFirstname(),
+                    'lastname'  => $user?->getLastname(),
+                ]
+            ];
+        }
+        return new JsonResponse($results, Response::HTTP_OK);
     }
 
-    /**
-     * @throws MappingException
-     * @throws LockException
-     */
     #[Route('/comment/add', name: 'app_add_comment', methods: ['POST'])]
     public function addComment(Request $request, CommentRepository $commentRepository, DocumentManager $documentManager,
                                UsersRepository $usersRepository, ValidatorInterface $validator): JsonResponse
@@ -47,7 +62,7 @@ class CommentController extends AbstractController
             return new JsonResponse(['errors' => 'Station de ski non renseigné'], Response::HTTP_BAD_REQUEST);
         }
         $stationRepository = $documentManager->getRepository(Station::class);
-        $station = $stationRepository->find($data['osmId']);
+        $station = $stationRepository->findOneBy(['osmId' => $data['osmId']]);
         if (!isset($station)) {
             return new JsonResponse(['errors' => 'Station de ski non trouvé'], Response::HTTP_BAD_REQUEST);
         }
@@ -55,7 +70,7 @@ class CommentController extends AbstractController
         $comment = new Comment();
         $comment->setOsmId($data['osmId']);
         $user = $this->getUser()->getUserIdentifier();
-        $user = $usersRepository->findOneBy(['email' => $user]);
+        $user = $usersRepository->findOneBy(['id' => $user]);
         $comment->setUser($user);
         $comment->setCreatedAt(new DateTimeImmutable('now'));
 
@@ -96,7 +111,7 @@ class CommentController extends AbstractController
         }
 
         $user = $this->getUser()->getUserIdentifier();
-        $user = $usersRepository->findOneBy(['email' => $user]);
+        $user = $usersRepository->findOneBy(['id' => $user]);
         if(!in_array('ROLE_ADMIN',$user->getRoles(),true) || $user != $comment->getUser()) {
             return new JsonResponse(['errors' => 'Vous ne pouvez pas supprimer ce commentaire.'], Response::HTTP_BAD_REQUEST);
         }

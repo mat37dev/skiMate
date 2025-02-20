@@ -43,7 +43,7 @@ class Comment
     #[Assert\NotNull(message: "La note est requise.")]
     #[Assert\Range(
         notInRangeMessage: "La note doit être comprise entre {{ min }} et {{ max }}.",
-        min: 0,
+        min: 1,
         max: 5
     )]
     private ?float $note = null;

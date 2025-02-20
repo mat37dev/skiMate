@@ -7,8 +7,6 @@ use App\Repository\CommentRepository;
 use App\Repository\UsersRepository;
 use DateTimeImmutable;
 use Doctrine\ODM\MongoDB\DocumentManager;
-use Doctrine\ODM\MongoDB\LockException;
-use Doctrine\ODM\MongoDB\Mapping\MappingException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -44,10 +42,9 @@ class CommentController extends AbstractController
                 'title'       => $comment->getTitle(),
                 'description' => $comment->getDescription(),
                 'note'        => $comment->getNote(),
-                'user' => [
-                    'firstname' => $user?->getFirstname(),
-                    'lastname'  => $user?->getLastname(),
-                ]
+                'firstName' => $user->getFirstname(),
+                'lastName'  => $user->getLastname(),
+                'createdAt'   => $comment->getCreatedAt(),
             ];
         }
         return new JsonResponse($results, Response::HTTP_OK);

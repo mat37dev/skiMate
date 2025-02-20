@@ -4,37 +4,64 @@ namespace App\Entity;
 
 use App\Repository\CommentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
 class Comment
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\Column(type:'string', length:36, unique:true)]
+    #[ORM\Column(type: 'string', length: 36, unique: true)]
     #[ORM\CustomIdGenerator(class: 'doctrine.uuid_generator')]
     private ?string $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre ne doit pas être vide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le titre ne peut dépasser {{ limit }} caractères."
+    )]
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "La description ne doit pas être vide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "La description ne peut dépasser {{ limit }} caractères."
+    )]
     private ?string $description = null;
 
-    #[ORM\Column(length: 50)]
-    private ?string $entityType = null;
-
     #[ORM\Column]
-    private ?int $entityId = null;
+    #[Assert\NotBlank(message: "L'osmId ne doit pas être vide.")]
+    private ?string $osmId = null;
 
     #[ORM\ManyToOne]
-    private ?Users $users = null;
+    #[Assert\NotNull(message: "L'utilisateur est requis.")]
+    private ?Users $user = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $note = null;
+    #[ORM\Column(type: "float")]
+    #[Assert\NotNull(message: "La note est requise.")]
+    #[Assert\Range(
+        notInRangeMessage: "La note doit être comprise entre {{ min }} et {{ max }}.",
+        min: 1,
+        max: 5
+    )]
+    private ?float $note = null;
+
+    #[ORM\Column(nullable: false)]
+    private bool $isValide = true;
+
+    #[ORM\Column(nullable: false)]
+    private \DateTimeImmutable $createdAt;
 
     public function getId(): ?string
     {
         return $this->id;
+    }
+
+    public function setId(?string $id): void
+    {
+        $this->id = $id;
     }
 
     public function getTitle(): ?string
@@ -42,11 +69,9 @@ class Comment
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    public function setTitle(?string $title): void
     {
         $this->title = $title;
-
-        return $this;
     }
 
     public function getDescription(): ?string
@@ -54,58 +79,58 @@ class Comment
         return $this->description;
     }
 
-    public function setDescription(string $description): static
+    public function setDescription(?string $description): void
     {
         $this->description = $description;
-
-        return $this;
     }
 
-    public function getEntityType(): ?string
+    public function getOsmId(): ?string
     {
-        return $this->entityType;
+        return $this->osmId;
     }
 
-    public function setEntityType(string $entityType): static
+    public function setOsmId(?string $osmId): void
     {
-        $this->entityType = $entityType;
-
-        return $this;
+        $this->osmId = $osmId;
     }
 
-    public function getEntityId(): ?int
+    public function getUser(): ?Users
     {
-        return $this->entityId;
+        return $this->user;
     }
 
-    public function setEntityId(int $entityId): static
+    public function setUser(?Users $user): void
     {
-        $this->entityId = $entityId;
-
-        return $this;
+        $this->user = $user;
     }
 
-    public function getUsers(): ?Users
-    {
-        return $this->users;
-    }
-
-    public function setUsers(?Users $users): static
-    {
-        $this->users = $users;
-
-        return $this;
-    }
-
-    public function getNote(): ?int
+    public function getNote(): ?float
     {
         return $this->note;
     }
 
-    public function setNote(?int $note): static
+    public function setNote(?float $note): void
     {
         $this->note = $note;
+    }
 
-        return $this;
+    public function isValide(): bool
+    {
+        return $this->isValide;
+    }
+
+    public function setIsValide(bool $isValide): void
+    {
+        $this->isValide = $isValide;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): void
+    {
+        $this->createdAt = $createdAt;
     }
 }

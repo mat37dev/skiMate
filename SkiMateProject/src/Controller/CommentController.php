@@ -1,105 +1,83 @@
 <?php
-
 namespace App\Controller;
 
+use App\Document\Station;
 use App\Entity\Comment;
 use App\Repository\CommentRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\Uid\Uuid;
-use Symfony\Component\HttpFoundation\Request;
+use App\Repository\UsersRepository;
+use DateTimeImmutable;
+use Doctrine\ODM\MongoDB\DocumentManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-#[Route('/api/comment')]
+#[Route('/api')]
 class CommentController extends AbstractController
 {
-    public function __construct(
-        private CommentRepository $commentRepository,
-        private EntityManagerInterface $entityManager,
-    )
-    {
-    }
-    #[Route('/', name: 'app_comment', methods: ["GET"])]
-    public function listComments(): JsonResponse
-    {
-        $comments = $this->commentRepository->findAll();
+    #[Route('/comments', name: 'app_comments', methods: ['POST'])]
+    public function getComment(
+        Request $request,
+        CommentRepository $commentRepository,
+        SerializerInterface $serializer
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['osmId'])) {
+            return new JsonResponse(['message' => 'Station de ski non renseigné'], Response::HTTP_BAD_REQUEST);
+        }
 
-        $commentsData = [];
+        $comments = $commentRepository->findBy([
+            'osmId' => $data['osmId'],
+            'isValide' => true
+        ]);
+
+        $results = [];
         foreach ($comments as $comment) {
-            $commentsData[] = [
-                'id' => $comment->getId(),
-                'title' => $comment->getTitle(),
+            $user = $comment->getUser();
+            $results[] = [
+                'id'          => $comment->getId(),
+                'title'       => $comment->getTitle(),
                 'description' => $comment->getDescription(),
-                'user'=>$comment->getUsers(),
-                'note'=>$comment->getNote(),
+                'note'        => $comment->getNote(),
+                'firstName' => $user->getFirstname(),
+                'lastName'  => $user->getLastname(),
+                'createdAt'   => $comment->getCreatedAt(),
             ];
         }
-
-        return $this->json($commentsData, 200);
+        return new JsonResponse($results, Response::HTTP_OK);
     }
 
-    #[Route('/add', name: 'app_add_comment', methods: ["POST"])]
-    public function AddComment(Request $request): JsonResponse
+    #[Route('/comment/add', name: 'app_add_comment', methods: ['POST'])]
+    public function addComment(Request $request, CommentRepository $commentRepository, DocumentManager $documentManager,
+                               UsersRepository $usersRepository, ValidatorInterface $validator): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
+        if (!isset($data['osmId'])) {
+            return new JsonResponse(['errors' => 'Station de ski non renseigné'], Response::HTTP_BAD_REQUEST);
+        }
+        $stationRepository = $documentManager->getRepository(Station::class);
+        $station = $stationRepository->findOneBy(['osmId' => $data['osmId']]);
+        if (!isset($station)) {
+            return new JsonResponse(['errors' => 'Station de ski non trouvé'], Response::HTTP_BAD_REQUEST);
+        }
+
         $comment = new Comment();
-        $comment->setTitle($data['title']);
-        $comment->setDescription($data['comment']);
-        $comment->setNote($data['note']);
+        $comment->setOsmId($data['osmId']);
+        $user = $this->getUser()->getUserIdentifier();
+        $user = $usersRepository->findOneBy(['id' => $user]);
+        $comment->setUser($user);
+        $comment->setCreatedAt(new DateTimeImmutable('now'));
 
-        $resort = random_int(1,10);
-        $resortId = random_int(1,10);
-        $comment->setEntityType($resort);
-        $comment->setEntityId($resortId);
-
-        $this->commentRepository->save($comment);
-
-        return $this->json([
-            'id' => $comment->getId(),
-            'title' => $comment->getTitle(),
-            'comment' => $comment->getDescription(),
-            'user' => $comment->getUsers(),
-            'note' => $comment->getNote(),
-            'resort'=>$comment->getEntityType(),
-            'resortId'=>$comment->getEntityId(),
-
-        ], Response::HTTP_CREATED);
-    }
-    #[Route('/delete/{id}', name: 'app_delete_comment', requirements: ['id'=>'^[0-9a-fA-F\-]{36}$'], methods: ['DELETE'])]
-    public function deleteComment(Uuid $id): JsonResponse
-    {
-        $comment = $this->commentRepository->find($id);
-
-        if(!$comment){
-            throw $this->createNotFoundException('commentaire non trouvé');
-        }
-
-        $this->commentRepository->remove($comment);
-
-        return $this->json([
-            'commentaire supprimé'
-        ],200);
-    }
-
-    #[Route('/edit/{id}', name: 'app_edit_comment', requirements: ['id'=>'^[0-9a-fA-F\-]{36}$'], methods: ['PUT'])]
-    public function editComment(Request $request,ValidatorInterface $validator, Uuid $id): JsonResponse
-    {
-        $comment = $this->commentRepository->find($id);
-        if (!$comment) {
-            return new JsonResponse(['message' => 'commentaire non trouvé'], Response::HTTP_NOT_FOUND);
-        }
-        $data = json_decode($request->getContent(), true);
-
-        if (isset($data['title'])) {
+        if(isset($data['title'])) {
             $comment->setTitle($data['title']);
         }
-        if(isset($data['comment'])){
-            $comment->setDescription($data['comment']);
+        if(isset($data['description'])) {
+            $comment->setDescription($data['description']);
         }
-        if (isset($data['note'])) {
+        if(isset($data['note'])) {
             $comment->setNote($data['note']);
         }
 
@@ -107,12 +85,95 @@ class CommentController extends AbstractController
         if (count($errors) > 0) {
             $errorsList = [];
             foreach ($errors as $error) {
-                $errorsList[] = $error->getMessage();
+                $errorsList[$error->getPropertyPath()] = $error->getMessage();
             }
             return new JsonResponse(['errors' => $errorsList], Response::HTTP_BAD_REQUEST);
         }
-        $this->commentRepository->save($comment);
 
-        return new JsonResponse(['message' => 'commentaire mis à jour avec succès'], Response::HTTP_OK);
+        $commentRepository->save($comment);
+        return new JsonResponse(['message' => 'Le commentaire a bien été ajouté.'], Response::HTTP_CREATED);
+    }
+
+    #[Route('/comment/delete', name: 'app_delete_comment', methods: ['POST'])]
+    public function deleteComment(Request $request, CommentRepository $commentRepository, UsersRepository $usersRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['commentId'])) {
+            return new JsonResponse(['errors' => 'Vous devez renseigner un commentaire.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $comment = $commentRepository->find($data['commentId']);
+        if (!isset($comment)) {
+            return new JsonResponse(['errors' => 'Commentaire non trouvé.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $user = $this->getUser()->getUserIdentifier();
+        $user = $usersRepository->findOneBy(['id' => $user]);
+        if(!in_array('ROLE_ADMIN',$user->getRoles(),true) || $user != $comment->getUser()) {
+            return new JsonResponse(['errors' => 'Vous ne pouvez pas supprimer ce commentaire.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        $commentRepository->remove($comment);
+        return new JsonResponse(['message' => 'Le commentaire a bien été supprimé.'], Response::HTTP_OK);
+    }
+
+    #[Route('/admin/comments', name: 'app_admin_comments', methods: ['GET'])]
+    public function getAllComments(Request $request, CommentRepository $commentRepository, SerializerInterface $serializer): JsonResponse
+    {
+        $recherche = $request->query->get('search');
+        $dateParam = $request->query->get('date');
+        $isValideParam = $request->query->get('isValide');
+
+        $date = null;
+        if ($dateParam) {
+            $date = DateTimeImmutable::createFromFormat('d/m/y', $dateParam);
+            if (!$date) {
+                return new JsonResponse(['error' => 'Le format de la date doit être DD/MM/YY.'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $isValide = null;
+        if ($isValideParam !== null) {
+            $isValide = filter_var($isValideParam, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        }
+
+        $comments = $commentRepository->searchComments($recherche, $date, $isValide);
+
+        $results = [];
+        foreach ($comments as $comment) {
+            $user = $comment->getUser();
+            $results[] = [
+                'id'          => $comment->getId(),
+                'title'       => $comment->getTitle(),
+                'description' => $comment->getDescription(),
+                'note'        => $comment->getNote(),
+                'userId'      => $user->getId(),
+                'firstName'   => $user->getFirstname(),
+                'lastName'    => $user->getLastname(),
+                'createdAt'   => $comment->getCreatedAt(),
+                'isValide'    => $comment->isValide(),
+            ];
+        }
+        return new JsonResponse($results, Response::HTTP_OK);
+    }
+
+    #[Route('/admin/comment/valide', name: 'app_valide_comment', methods: ['POST'])]
+    public function disableComment(Request $request, CommentRepository $commentRepository): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!isset($data['commentId'])) {
+            return new JsonResponse(['errors' => 'Vous devez renseigner un commentaire.'], Response::HTTP_BAD_REQUEST);
+        }
+        $comment = $commentRepository->find($data['commentId']);
+        if (!isset($comment)) {
+            return new JsonResponse(['errors' => 'Commentaire non trouvé.'], Response::HTTP_BAD_REQUEST);
+        }
+
+        if(!isset($data['isValide'])) {
+            return new JsonResponse(['errors' => 'Vous devez renseigner un état au commentaire.'], Response::HTTP_BAD_REQUEST);
+        }
+        $comment->setIsValide($data['isValide']);
+        $commentRepository->save($comment);
+        return new JsonResponse(['message' => 'Le commentaire a bien été désactivé.'], Response::HTTP_OK);
     }
 }

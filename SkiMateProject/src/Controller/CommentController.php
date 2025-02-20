@@ -118,13 +118,46 @@ class CommentController extends AbstractController
     }
 
     #[Route('/admin/comments', name: 'app_admin_comments', methods: ['GET'])]
-    public function getAllComments(CommentRepository $commentRepository): JsonResponse
+    public function getAllComments(Request $request, CommentRepository $commentRepository, SerializerInterface $serializer): JsonResponse
     {
-       $comments = $commentRepository->findAll();
-       return new JsonResponse($comments);
+        $recherche = $request->query->get('search');
+        $dateParam = $request->query->get('date');
+        $isValideParam = $request->query->get('isValide');
+
+        $date = null;
+        if ($dateParam) {
+            $date = DateTimeImmutable::createFromFormat('d/m/y', $dateParam);
+            if (!$date) {
+                return new JsonResponse(['error' => 'Le format de la date doit être DD/MM/YY.'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+
+        $isValide = null;
+        if ($isValideParam !== null) {
+            $isValide = filter_var($isValideParam, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        }
+
+        $comments = $commentRepository->searchComments($recherche, $date, $isValide);
+
+        $results = [];
+        foreach ($comments as $comment) {
+            $user = $comment->getUser();
+            $results[] = [
+                'id'          => $comment->getId(),
+                'title'       => $comment->getTitle(),
+                'description' => $comment->getDescription(),
+                'note'        => $comment->getNote(),
+                'userId'      => $user->getId(),
+                'firstName'   => $user->getFirstname(),
+                'lastName'    => $user->getLastname(),
+                'createdAt'   => $comment->getCreatedAt(),
+                'isValide'    => $comment->isValide(),
+            ];
+        }
+        return new JsonResponse($results, Response::HTTP_OK);
     }
 
-    #[Route('/admin/comment/disable', name: 'app_admin_comment', methods: ['POST'])]
+    #[Route('/admin/comment/valide', name: 'app_valide_comment', methods: ['POST'])]
     public function disableComment(Request $request, CommentRepository $commentRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
@@ -136,7 +169,10 @@ class CommentController extends AbstractController
             return new JsonResponse(['errors' => 'Commentaire non trouvé.'], Response::HTTP_BAD_REQUEST);
         }
 
-        $comment->setIsValide(false);
+        if(!isset($data['isValide'])) {
+            return new JsonResponse(['errors' => 'Vous devez renseigner un état au commentaire.'], Response::HTTP_BAD_REQUEST);
+        }
+        $comment->setIsValide($data['isValide']);
         $commentRepository->save($comment);
         return new JsonResponse(['message' => 'Le commentaire a bien été désactivé.'], Response::HTTP_OK);
     }

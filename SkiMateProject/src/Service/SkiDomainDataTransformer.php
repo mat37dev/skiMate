@@ -3,9 +3,26 @@
 namespace App\Service;
 
 use App\Document\Station;
+use Exception;
+use Psr\Log\LoggerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SkiDomainDataTransformer
 {
+    private HttpClientInterface $httpClient;
+    private LoggerInterface $logger;
+
+    /**
+     * @param HttpClientInterface $httpClient
+     * @param LoggerInterface $logger
+     */
+    public function __construct(HttpClientInterface $httpClient, LoggerInterface $logger)
+    {
+        $this->httpClient = $httpClient;
+        $this->logger = $logger;
+    }
+
+
     public function transformStation(string $domainName, array $stationElement, array $stationsData): Station
     {
         $station = new Station();
@@ -49,7 +66,11 @@ class SkiDomainDataTransformer
         $geometry = $this->extractGeometry($element, $data);
 
         // Ajouter un champ d'orientation calculé
-        $orientation = $this->calculateOrientation($geometry);
+        if (in_array($category, ['run', 'lift'])) {
+            $orientation = $this->calculateOrientation($geometry);
+        } else {
+            $orientation = 'unknown';
+        }
 
         return [
             "type" => "Feature",
@@ -126,22 +147,73 @@ class SkiDomainDataTransformer
         return ['type' => 'GeometryCollection', 'coordinates' => []];
     }
 
-    private function calculateOrientation(array $geometry): float
+    private function calculateOrientation(array $geometry): string
     {
-        if ($geometry['type'] === 'LineString' && count($geometry['coordinates']) > 1) {
-            $firstPoint = $geometry['coordinates'][0];
-            $lastPoint = $geometry['coordinates'][count($geometry['coordinates']) - 1];
-
-            // Calculer l'angle entre le point de départ et d'arrivée
-            $deltaX = $lastPoint[0] - $firstPoint[0];
-            $deltaY = $lastPoint[1] - $firstPoint[1];
-            $angle = rad2deg(atan2($deltaY, $deltaX));
-
-            // Normaliser l'angle entre 0 et 360°
-            return ($angle + 360) % 360;
+        set_time_limit(300);
+        // Vérifier que la géométrie est de type LineString et possède au moins deux points
+        if ($geometry['type'] !== 'LineString' || count($geometry['coordinates']) < 2) {
+            return 'unknown';
         }
 
-        return 0.0; // Angle par défaut pour des géométries invalides
+        $firstPoint = $geometry['coordinates'][0];
+        $lastPoint = $geometry['coordinates'][count($geometry['coordinates']) - 1];
+
+        // Récupérer l'altitude pour le premier et le dernier point en une seule requête
+        $altitudes = $this->getAltitudesForCoordinates([$firstPoint, $lastPoint]);
+
+        if (count($altitudes) < 2) {
+            return 'unknown';
+        }
+
+        $firstAlt = $altitudes[0];
+        $lastAlt = $altitudes[1];
+
+        if ($firstAlt < $lastAlt) {
+            return 'asc';
+        } elseif ($firstAlt > $lastAlt) {
+            return 'desc';
+        } else {
+            return 'flat';
+        }
     }
 
+    private function getAltitudesForCoordinates(array $coordinates): array
+    {
+        set_time_limit(300);
+        // On s'attend à recevoir un tableau de coordonnées, chaque élément étant un tableau [lon, lat]
+        $lons = [];
+        $lats = [];
+        foreach ($coordinates as $coord) {
+            $lons[] = $coord[0];
+            $lats[] = $coord[1];
+        }
+
+        // Construit les paramètres en séparant les valeurs par "|"
+        $delimiter = '|';
+        $lonParam = implode($delimiter, $lons);
+        $latParam = implode($delimiter, $lats);
+
+        $url = 'https://data.geopf.fr/altimetrie/1.0/calcul/alti/rest/elevation.json';
+        try {
+            $response = $this->httpClient->request('GET', $url, [
+                'query' => [
+                    'lon'       => $lonParam,
+                    'lat'       => $latParam,
+                    'resource'  => 'ign_rge_alti_wld', // Spécifie la ressource altimétrique
+                    'delimiter' => $delimiter,         // Spécifie le délimiteur utilisé
+                    'zonly'     => 'true'              // Pour obtenir une réponse simple: {"elevations": [alt1, alt2]}
+                ]
+            ]);
+            if ($response->getStatusCode() === 200) {
+                $data = $response->toArray();
+                if (isset($data['elevations']) && is_array($data['elevations'])) {
+                    return $data['elevations'];
+                }
+            }
+        } catch (Exception $e) {
+            $this->logger->error("Erreur lors de la récupération des altitudes pour les points ($latParam / $lonParam) : " . $e->getMessage());
+        }
+
+        return [];
+    }
 }

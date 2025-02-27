@@ -41,16 +41,6 @@ class UsersRepository extends ServiceEntityRepository
 
         // Gérer le champ de recherche
         if ($search) {
-            // Exemple : vous voulez qu'un "search" de "Crosnier Mathieu"
-            // puisse matcher "firstname=Mathieu lastname=Crosnier" ou l'inverse.
-            //
-            // 1) On split la chaîne sur les espaces
-            // 2) On essaie de matcher chacun (ou faire un "LIKE" global si plus simple).
-            //
-            // Méthode A : faire un seul LIKE global pour la concat "firstname + lastname".
-            // Méthode B : plus complexe, on split et essaie de trouver "Mathieu" + "Crosnier" dans n'importe quel champ.
-
-            // Méthode A :
             $searchLike = '%'.$search.'%';
             $qb->andWhere(
                 $qb->expr()->orX(
@@ -69,41 +59,9 @@ class UsersRepository extends ServiceEntityRepository
                 )
             )->setParameter('search', $searchLike);
         }
-
-        // Optionnel : si vous voulez un DISTINCT pour éviter des doublons
-        // (car le JOIN roles peut retourner plusieurs lignes pour un même user)
         $qb->distinct();
 
         // Exécuter la requête
         return $qb->getQuery()->getResult();
     }
-
-
-
-
-
-    //    /**
-    //     * @return Users[] Returns an array of Users objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('u.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?Users
-    //    {
-    //        return $this->createQueryBuilder('u')
-    //            ->andWhere('u.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

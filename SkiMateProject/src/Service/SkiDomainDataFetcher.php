@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use Exception;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SkiDomainDataFetcher
@@ -31,7 +32,7 @@ class SkiDomainDataFetcher
         ]);
 
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception("Erreur lors de la récupération des stations pour le domaine skiable '$domainName'");
+            throw new Exception("Erreur lors de la récupération des stations pour le domaine skiable '$domainName'");
         }
 
         return json_decode($response->getContent(), true);
@@ -56,7 +57,7 @@ class SkiDomainDataFetcher
         ]);
 
         if ($response->getStatusCode() !== 200) {
-            throw new \Exception("Erreur lors de la récupération des features pour la station $wayId");
+            throw new Exception("Erreur lors de la récupération des features pour la station $wayId");
         }
 
         return json_decode($response->getContent(), true);

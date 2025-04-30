@@ -1,0 +1,48 @@
+name: CI PIPELINE
+
+on:
+    push:
+        branches: ["dev"]
+    pull_request:
+        branches: [ "dev" ]
+
+jobs:
+    build-and-test:
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Build services
+              run: docker compose -f docker-compose.yaml build
+
+            - name: Start Bdd
+              run: docker compose up -d db_pg_post
+
+            - name: Install dependencies
+              run: |
+                  docker compose run --rm php_post composer install \
+                  --no-ansi --no-interaction --no-progress --prefer-dist
+
+            - name: Create test database & schema
+              run: |
+                  docker compose run --rm php_post php bin/console doctrine:database:create --env=test
+                  docker compose run --rm php_post php bin/console doctrine:schema:create --env=test
+
+            - name: run Tests
+              run: docker compose run --rm php_post ./vendor/bin/phpunit --testdox
+
+            - name: check docker compose with renovate
+              uses: renovatebot/github-action@v41.0.22
+              with:
+                  token: ${{ secrets.RENOVATE }}
+              env:
+                  LOG_LEVEL: "debug"
+                  RENOVATE_REPOSITORIES: "2iAcademy/postCICD"
+
+
+
+            - name: Clean up containers
+              if: always()
+              run: docker compose down

@@ -1,19 +1,23 @@
 services:
-    phpmyadmin:
-        image: phpmyadmin
-        ports:
-            - "8081:80"
-        environment:
-            - PMA_ARBITRARY=1
-            - PMA_HOST=mysql
-            - MYSQL_ROOT_PASSWORD=skimate-password
-
-    php:
-        build:
-            context: .
-            dockerfile: DockerfilePHP/Dockerfile
+    server:
+        container_name: server_skimate
+        image: 'nginx:1.28.0-alpine3.21'
         volumes:
-            - ../SkiMateProject:/var/www/html
+            - ./SkiMateProject:/var/www/SkiMateProject
+            - ./.docker/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini
+        ports:
+            - '8081:80'
+        networks:
+            - network
+
+    php_skimate:
+        user: "1000"
+        build: ./.docker/php
+        working_dir: /www/SkiMateProject
+        volumes:
+            - ../SkiMateProject:/www/SkiMateProject
+            - ../SkiMateProject/var:/www/SkiMateProject/var
+            - .docker/php.ini:/etc/php/8.2/fpm/conf.d/99-overrides.ini
         ports:
             - "8080:80"
         environment:
@@ -21,25 +25,23 @@ services:
             - MYSQL_USER=skimate_user
             - MYSQL_PASSWORD=skimate
             - MYSQL_DATABASE=skimate
-        depends_on:
-            - mysql
-            - mongo
+        networks:
+            - network
 
-    mysql:
-        image: mysql:8.0.21
+    mysql_skimate:
+        image: mysql:8.4.5
         environment:
             - MYSQL_ROOT_PASSWORD=skimate-password
             - MYSQL_DATABASE=skimate
             - MYSQL_USER=skimate_user
             - MYSQL_PASSWORD=skimate
-        ports:
-            - "3306:3306"
         volumes:
             - mysql_data:/var/lib/mysql
+        networks:
+            - network
 
-    mongo:
-        image: mongo
-        restart: always
+    mongo_skimate:
+        image: mongo:8.0
         environment:
             - MONGO_INITDB_ROOT_USERNAME=skimate
             - MONGO_INITDB_ROOT_PASSWORD=skimate
@@ -47,20 +49,13 @@ services:
             - "27017:27017"
         volumes:
             - mongo_data:/data/db
-
-    mongo-express:
-        image: mongo-express
-        restart: always
-        environment:
-            - ME_CONFIG_MONGODB_ADMINUSERNAME=skimate
-            - ME_CONFIG_MONGODB_ADMINPASSWORD=skimate
-            - ME_CONFIG_MONGODB_SERVER=mongo
-            - ME_CONFIG_BASICAUTH_USERNAME=skimate
-            - ME_CONFIG_BASICAUTH_PASSWORD=skimate
-        ports:
-            - "8082:8081"
+        networks:
+            - network
 
 
 volumes:
     mysql_data:
     mongo_data:
+networks:
+    network:
+        driver: bridge

@@ -1,2 +1,40 @@
-/.idea/
+# Environnement et configurations locales
+/symfony/.env.local
+/.env.*.local
+/.env.local.php
 
+# Clés de déchiffrement et secrets en production
+/symfony/config/secrets/prod/prod.decrypt.private.php
+/config/jwt/*.pem
+
+# Cache, logs, et autres fichiers temporaires
+/symfony/var/cache/
+/symfony/var/logs/
+/symfony/var/log/
+/symfony/var/sessions/
+/symfony/symfony/var/backups/
+/symfony/var/test/
+/symfony/public/bundles/
+
+# Fichiers générés par Composer et les vendor
+/symfony/vendor/
+
+# Migration et autres fichiers générés
+/symfony/migrations/
+
+# IDE / éditeurs
+/.idea/
+/.vscode/
+/*.iml
+
+# Fichiers de build spécifiques à Docker (si utilisés)
+docker-compose.override.yml
+/docker/
+
+# Fichiers compilés spécifiques à Java
+*.class
+*.jar
+*.war
+*.ear
+
+/symfony/config/jwt/

@@ -1,5 +1,9 @@
 FROM php:8.2-fpm-alpine3.18
 
+RUN mkdir -p var/cache var/log \
+    && chown -R www-data:www-data var \
+    && chmod -R 775 var
+
 # Mettre à jour les dépôts et installer les dépendances nécessaires
 RUN apk update \
     && apk add \
@@ -24,14 +28,20 @@ RUN apk update \
     && docker-php-ext-configure intl \
     && docker-php-ext-install intl
 
+RUN mkdir -p /var/www/symfony/var/cache /var/www/symfony/var/logs \
+    && chown -R www-data:www-data /var/www/symfony/var \
+    && chmod -R 775 /var/www/symfony/var
+
+
+
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 
-
-# Donner les bons droits pour Apache
-#RUN chown -R www-data:www-data /var/www/html && \
-#    chmod -R 755 /var/www/html
+COPY .docker/php/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+CMD ["php-fpm"]
 
 

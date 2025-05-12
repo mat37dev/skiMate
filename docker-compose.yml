@@ -18,7 +18,7 @@ services:
         volumes:
             - ./symfony:/var/www/symfony
             - symfony_var:/var/www/symfony/var
-            - ./.docker/php/php.ini:/etc/php/8.2/fpm/conf.d/99-overrides.ini
+            - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini:ro
         ports:
             - "8080:80"
         environment:

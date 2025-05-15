@@ -38,3 +38,5 @@ docker-compose.override.yml
 *.ear
 
 /symfony/config/jwt/
+/.env
+/symfony/public/uploads/logos/

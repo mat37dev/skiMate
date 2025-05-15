@@ -1,9 +1,5 @@
 FROM php:8.2-fpm-alpine3.18
 
-RUN mkdir -p var/cache var/log \
-    && chown -R www-data:www-data var \
-    && chmod -R 775 var
-
 # Mettre à jour les dépôts et installer les dépendances nécessaires
 RUN apk update \
     && apk add \
@@ -27,11 +23,6 @@ RUN apk update \
     && apk add libpq-dev && docker-php-ext-install pdo_mysql \
     && docker-php-ext-configure intl \
     && docker-php-ext-install intl
-
-RUN mkdir -p /var/www/symfony/var/cache /var/www/symfony/var/logs \
-    && chown -R www-data:www-data /var/www/symfony/var \
-    && chmod -R 775 /var/www/symfony/var
-
 
 
 RUN pecl install mongodb && docker-php-ext-enable mongodb

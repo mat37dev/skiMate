@@ -9,8 +9,8 @@ use Doctrine\ODM\MongoDB\DocumentManager;
 use MongoDB\BSON\Regex;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,18 +20,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route('/api')]
 class SkiDomaineDataController extends AbstractController
 {
-
-    private LoggerInterface $logger;
-
-    /**
-     * @param LoggerInterface $logger
-     */
-    public function __construct(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-
     #[Route('/admin/domaine-data', name: 'app_admin_domaine_data', methods: ['POST'])]
     public function index(
         Request $request,
@@ -401,72 +389,74 @@ class SkiDomaineDataController extends AbstractController
     }
 
     #[Route('/admin/upload/logo', name: 'app_upload_logo', methods: ['POST'])]
-    public function uploadLogo(Request $request, DocumentManager $documentManager): JsonResponse
+    public function uploadLogo(Request $request, DocumentManager $dm, LoggerInterface $logger): JsonResponse
     {
-        // Récupérer le fichier envoyé dans le champ "logo"
-        $file = $request->files->get('logo');
+        // 1) Récupération du fichier et de l’ID OSM
+        /** @var UploadedFile|null $file */
+        $file  = $request->files->get('logo');
         $osmId = $request->request->get('osmId');
 
         if (!$file) {
-            return new JsonResponse(['error' => 'Aucun fichier n\'a été téléchargé.'], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Aucun fichier n’a été téléchargé.'], Response::HTTP_BAD_REQUEST);
         }
         if (!$osmId) {
-            return new JsonResponse(['error' => "Vous devez renseigner le osmId."], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'Vous devez renseigner le osmId.'], Response::HTTP_BAD_REQUEST);
         }
 
-        $stationRepository = $documentManager->getRepository(Station::class);
-        $station = $stationRepository->findOneBy(['osmId' => $osmId]);
+        // 2) Récupération de la station
+        $station = $dm->getRepository(Station::class)->findOneBy(['osmId' => $osmId]);
         if (!$station) {
-            return new JsonResponse(['error' => "La station n'a pas été trouvée."], Response::HTTP_BAD_REQUEST);
+            return $this->json(['error' => 'La station n’a pas été trouvée.'], Response::HTTP_BAD_REQUEST);
         }
 
-        // Valider que le fichier est bien une image (optionnel mais recommandé)
-        $allowedMimeTypes = ['image/jpeg', 'image/png', 'image/gif'];
-        if (!in_array($file->getMimeType(), $allowedMimeTypes)) {
-            return new JsonResponse(['error' => 'Type de fichier non autorisé.'], Response::HTTP_BAD_REQUEST);
+        // 3) Validation du type MIME
+        $allowed = ['image/jpeg','image/png','image/gif'];
+        if (!in_array($file->getMimeType(), $allowed, true)) {
+            return $this->json(['error' => 'Type de fichier non autorisé.'], Response::HTTP_BAD_REQUEST);
         }
 
-        // Supprimer l'ancienne image si elle existe
-        $oldLogoUrl = $station->getLogo();
-        if ($oldLogoUrl) {
-            // Récupérer le répertoire d'upload à partir des paramètres
+        // 4) Suppression de l’ancien logo
+        $old = $station->getLogo();
+        if ($old) {
             $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/logos';
-            // On extrait le nom du fichier depuis l'URL (par exemple, "logo123.png")
-            $oldFilename = basename($oldLogoUrl);
-            $oldFilePath = $uploadDir . DIRECTORY_SEPARATOR . $oldFilename;
-            $filesystem = new Filesystem();
-            if ($filesystem->exists($oldFilePath)) {
-                try {
-                    $filesystem->remove($oldFilePath);
-                    $this->logger->info("Ancien logo supprimé : $oldFilePath");
-                } catch (FileException $e) {
-                    // Vous pouvez loguer l'erreur mais continuer l'upload si nécessaire
-                    $this->logger->error("Erreur lors de la suppression de l'ancien logo : " . $e->getMessage());
-                }
+            $oldFile   = $uploadDir . '/' . basename($old);
+            if (is_file($oldFile)) {
+                @unlink($oldFile);
             }
         }
 
-        // Générer un nom de fichier sûr
-        $originalFilename = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
-        $safeFilename = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $originalFilename);
-        $newFilename = $safeFilename . '-' . uniqid() . '.' . $file->guessExtension();
-
-        // Déplacer le fichier dans le répertoire de destination
-        try {
-            $file->move($this->getParameter('logo_upload_directory'), $newFilename);
-        } catch (FileException $e) {
-            return new JsonResponse(['error' => 'Erreur lors du téléchargement du fichier.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        // 5) Préparation du dossier de stockage
+        $uploadDir = $this->getParameter('kernel.project_dir') . '/public/uploads/logos';
+        if (!is_dir($uploadDir)) {
+            if (!@mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+                // Échec de la création du dossier
+                $logger->error("Impossible de créer le répertoire $uploadDir");
+                return $this->json(['error' => 'Erreur serveur interne.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+            }
         }
 
-        // Construire l'URL relative du logo
-        $logoUrl = '/uploads/logos/' . $newFilename;
-        $station->setLogo($logoUrl);
-        $documentManager->persist($station);
-        $documentManager->flush();
+        // 6) Génération d’un nom de fichier « safe »
+        $orig         = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safe         = transliterator_transliterate('Any-Latin; Latin-ASCII; [^A-Za-z0-9_] remove; Lower()', $orig);
+        $newFilename  = sprintf('%s-%s.%s', $safe, uniqid(), $file->guessExtension());
 
-        return new JsonResponse([
+        // 7) Déplacement du fichier
+        try {
+            $file->move($uploadDir, $newFilename);
+        } catch (FileException $e) {
+            $logger->error('Erreur lors du téléchargement du logo : '.$e->getMessage());
+            return $this->json(['error' => 'Erreur lors du téléchargement du fichier.'], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        // 8) Mise à jour de l’entité et sauvegarde
+        $url = '/uploads/logos/'.$newFilename;
+        $station->setLogo($url);
+        $dm->persist($station);
+        $dm->flush();
+
+        return $this->json([
             'message' => 'Logo enregistré avec succès.',
-            'logoUrl' => $logoUrl,
+            'logoUrl' => $url,
         ], Response::HTTP_OK);
     }
 }

@@ -7,7 +7,7 @@ use App\Entity\Session;
 use App\Entity\Users;
 use App\Repository\SkiLevelRepository;
 use App\Repository\SkiPreferenceRepository;
-use App\Repository\UsersRepository;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\OrderedFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -19,9 +19,8 @@ class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGr
 {
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
-        private UsersRepository $usersRepository,
-        private SkiLevelRepository $skiLevelRepository,
-        private SkiPreferenceRepository $skiPreferenceRepository
+        private readonly SkiLevelRepository          $skiLevelRepository,
+        private readonly SkiPreferenceRepository     $skiPreferenceRepository
     ) {}
 
     public function getOrder(): int
@@ -73,7 +72,7 @@ class UserFixtures extends Fixture implements OrderedFixtureInterface, FixtureGr
 
         $session1 = new Session();
         $session2 = new Session();
-        $now = new \DateTime();
+        $now = new DateTime();
         $session1->setUser($user);
         $session2->setUser($user);
         $session1->setDistance(50);

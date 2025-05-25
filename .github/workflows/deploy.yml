@@ -10,24 +10,12 @@ jobs:
     build-and-test:
         runs-on: ubuntu-latest
 
-        services:
-            mysql:
-                image: mysql:8.4.5
-                env:
-                    MYSQL_ROOT_PASSWORD: test_skimate
-                    MYSQL_DATABASE: testdb
-                    MYSQL_USER: user_test
-                    MYSQL_PASSWORD: skimate
-
-                options: >-
-                    --health-cmd="mysqladmin ping -h 127.0.0.1"
-                    --health-interval=10s
-                    --health-timeout=5s
-                    --health-retries=3
-
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
+
+            - name: Copy .env.test
+              run: cp .env.test.ci .env.test
 
             - name: Build containers
               run: docker compose -f docker-compose.yaml build
@@ -35,27 +23,30 @@ jobs:
             - name: Start containers
               run: docker compose up -d
 
-            - name: Wait for DB
+            - name: Wait for MySQL to be ready
               run: sleep 20
 
-            - name: Install dependencies
+            - name: Install Composer dependencies
               run: |
                   docker compose run --rm php composer install \
                     --no-ansi --no-interaction --no-progress --prefer-dist
 
             - name: Generate JWT keys
               run: |
-                  docker compose exec -e JWT_PASSPHRASE=${{ secrets.JWT_PASSPHRASE }} php bash -c "
+                  docker compose exec -T php bash -c "
                   mkdir -p config/jwt &&
-                  openssl genrsa -out config/jwt/private.pem -aes256 -passout pass:\$JWT_PASSPHRASE 4096 &&
-                  openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem -passin pass:\$JWT_PASSPHRASE
+                  openssl genrsa -out config/jwt/private.pem -aes256 -passout pass:${{ secrets.JWT_PASSPHRASE }} 4096 &&
+                  openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem -passin pass:${{ secrets.JWT_PASSPHRASE }}
                   "
 
-            - name: Run PHPUnit
+            - name: Prepare test DB
+              run: |
+                  docker compose exec -T php_skimate php bin/console doctrine:database:create --env=test
+                  docker compose exec -T php_skimate php bin/console doctrine:migrations:migrate --env=test --no-interaction
+                  docker compose exec -T php_skimate php bin/console doctrine:fixtures:load --env=test --no-interaction
+
+            - name: Run PHPUnit tests
               env:
                   JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
               run: |
-                  docker compose exec php php bin/console doctrine:database:create --env=test
-                  docker compose exec php php bin/console doctrine:migrations:migrate --env=test --no-interaction
-                  docker compose exec php php bin/console doctrine:fixtures:load --env=test --no-interaction
-                  docker compose exec php ./vendor/bin/phpunit --coverage-clover=coverage.xml
+                  docker compose exec -T php ./vendor/bin/phpunit --coverage-clover=coverage.xml

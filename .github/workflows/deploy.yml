@@ -4,45 +4,76 @@ on:
     push:
         branches: ["dev"]
     pull_request:
-        branches: [ "dev" ]
+        branches: ["dev"]
 
 jobs:
     build-and-test:
         runs-on: ubuntu-latest
 
+
+        services:
+            mysql:
+                image: mysql:8.4.5
+                env:
+                    MYSQL_ROOT_PASSWORD: AppImmoPassword
+                    MYSQL_DATABASE: testdb_test
+                    MYSQL_USER: user_test
+                    MYSQL_PASSWORD: test
+
+                options: >-
+                    --health-cmd="mysqladmin ping -h 127.0.0.1"
+                    --health-interval=10s
+                    --health-timeout=5s
+                    --health-retries=3
+
         steps:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Build services
+            - name: Build containers
               run: docker compose -f docker-compose.yaml build
 
-            - name: Start Bdd
-              run: docker compose up -d skimate
+            - name: Start containers
+              run: docker compose up -d
+
+            - name: Wait for DB
+              run: sleep 20
 
             - name: Install dependencies
               run: |
-                  docker compose run --rm php_post composer install \
-                  --no-ansi --no-interaction --no-progress --prefer-dist
+                  docker compose run --rm php composer install \
+                    --no-ansi --no-interaction --no-progress --prefer-dist
 
-            - name: Create test database & schema
+            - name: Generate JWT keys
               run: |
-                  docker compose run --rm php_post php bin/console doctrine:database:create --env=test
-                  docker compose run --rm php_post php bin/console doctrine:schema:create --env=test
+                  docker compose exec -e JWT_PASSPHRASE=${{ secrets.JWT_PASSPHRASE }} php bash -c "
+                  mkdir -p config/jwt &&
+                  openssl genrsa -out config/jwt/private.pem -aes256 -passout pass:\$JWT_PASSPHRASE 4096 &&
+                  openssl rsa -pubout -in config/jwt/private.pem -out config/jwt/public.pem -passin pass:\$JWT_PASSPHRASE
+                  "
+            - name: permission JWT
+              run: |
+                  docker compose exec php bash -c "
+                  chmod 600 config/jwt/private.pem &&
+                  chmod 644 config/jwt/public.pem
+                  "
 
-            - name: run Tests
-              run: docker compose run --rm php_post ./vendor/bin/phpunit --testdox
-
-            - name: check docker compose with renovate
-              uses: renovatebot/github-action@v41.0.22
-              with:
-                  token: ${{ secrets.RENOVATE }}
+            - name: Run PHPUnit with coverage
               env:
-                  LOG_LEVEL: "debug"
-                  RENOVATE_REPOSITORIES: "2iAcademy/postCICD"
+                  JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
+              run: |
+                  docker compose exec php php bin/console doctrine:database:create --env=test
+                  docker compose exec php php bin/console doctrine:migrations:migrate --env=test --no-interaction
+                  docker compose exec php php bin/console doctrine:fixtures:load --env=test --no-interaction
+                  docker compose exec php ./vendor/bin/phpunit --coverage-clover=coverage.xml
 
-
-
-            - name: Clean up containers
-              if: always()
-              run: docker compose down
+            - name: Run SonarQube Scanner
+              uses: SonarSource/sonarcloud-github-action@master
+              env:
+                  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+              with:
+                  args: >
+                      -Dsonar.projectKey=appImmo
+                      -Dsonar.sources=.
+                      -Dsonar.host.url=${{ secrets.SONAR_HOST_URL }}
+                      -Dsonar.php.coverage.reportPaths=coverage.xml

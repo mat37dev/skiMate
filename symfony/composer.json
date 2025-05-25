@@ -38,6 +38,7 @@
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^3.6",
+        "phpunit/phpunit": "^11",
         "symfony/maker-bundle": "^1.60",
         "symfony/stopwatch": "7.1.*",
         "symfony/var-dumper": "7.1.*",

@@ -14,8 +14,9 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
 
-            - name: Build containers
-              run: docker compose -f docker-compose.yaml build
+            -   name: Build containers
+            -   run: docker compose build
+
 
             - name: Start containers
               run: docker compose up -d

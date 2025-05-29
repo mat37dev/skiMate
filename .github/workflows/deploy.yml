@@ -57,7 +57,7 @@ jobs:
               env:
                   JWT_PASSPHRASE: ${{ secrets.JWT_PASSPHRASE }}
                   APP_ENV: test
-              run: docker compose exec -T php_skimate php ./vendor/bin/phpunit --coverage-clover=coverage.xml
+              run: docker compose exec -T php_skimate php ./vendor/bin/phpunit
 
 
             - name: Stop containers

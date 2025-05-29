@@ -30,6 +30,13 @@ jobs:
                     -e JWT_PASSPHRASE=${{ secrets.JWT_PASSPHRASE }} \
                     php_skimate composer install \
                     --no-ansi --no-interaction --no-progress --prefer-dist
+                  
+            - name: List files in Symfony app
+              run: docker compose exec -T php_skimate ls -la /var/www/symfony
+
+            - name: Check migrations directory
+              run: docker compose exec -T php_skimate ls -la /var/www/symfony/migrations
+
 
 
             - name: Generate JWT keys

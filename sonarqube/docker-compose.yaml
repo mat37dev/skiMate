@@ -38,11 +38,13 @@ services:
         depends_on:
             sonarqubecicd:
                 condition: service_healthy
+        env_file:
+            -   ../symfony/.env.local
         environment:
             SONAR_HOST_URL: "http://sonarqubecicd:9000"
-            #SONAR_TOKEN: "sqp_f40c3cb06488a5e6177165f6b72fc2cdadfd3adf"
+
         volumes:
-            - ../symfony:/usr/src
+            - ./symfony:/usr/src
 volumes:
         sonarcicd_data:
         sonarcicd_extensions:

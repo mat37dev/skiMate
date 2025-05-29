@@ -21,6 +21,7 @@ services:
             - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini:ro
         ports:
             - "8080:80"
+
         environment:
             - MYSQL_HOST=mysql
             - MYSQL_USER=skimate_user

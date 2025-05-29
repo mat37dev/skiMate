@@ -25,7 +25,7 @@ jobs:
 
             - name: Install Composer dependencies
               run: |
-                  docker compose run --rm php_skimate composer install \
+                  docker compose run --rm -e JWT_PASSPHRASE=${{ secrets.JWT_PASSPHRASE }} php_skimate composer install \
                     --no-ansi --no-interaction --no-progress --prefer-dist
 
             - name: Generate JWT keys

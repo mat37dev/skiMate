@@ -123,7 +123,7 @@ class AuthTest extends WebTestCase
             'phoneNumber' => '0600000000'
         ]));
 
-        $this->assertResponseStatusCodeSame(400); // ou 422
+        $this->assertResponseStatusCodeSame(400);
 
         $response2 = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('errors', $response2);

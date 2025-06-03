@@ -38,9 +38,9 @@ class AuthTest extends WebTestCase
         $client->request('POST', '/api/register', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'email' => 'dupe@example.com',
-            'password' => 'DupPass123!',
-            'confirmPassword'=>'DupPass123!',
+            'email' => 'dupe@test.com',
+            'password' => 'testPass123!',
+            'confirmPassword'=>'testPass123!',
             'firstName' => 'name',
             'lastName' => 'lastname',
             'phoneNumber' => '1234567890',
@@ -51,12 +51,12 @@ class AuthTest extends WebTestCase
         $client->request('POST', '/api/register', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'email' => 'dupe@example.com',
-            'password' => 'AnotherPass!',
-            'confirmPassword'=>'AnotherPass!',
+            'email' => 'dupe@test.com',
+            'password' => 'testPass123!',
+            'confirmPassword'=>'testPass123!',
             'firstName' => 'name',
             'lastName' => 'lastname',
-            'phoneNumber' => '1234567890',
+            'phoneNumber' => '0987654321',
         ]));
 
         $this->assertResponseStatusCodeSame(400);
@@ -131,5 +131,26 @@ class AuthTest extends WebTestCase
             'Le mot de passe doit contenir au moins 8 caractères',
             $response2['errors']
         );
+
+        // Cas 3 : avoir un champ vide
+//        $client->request('POST', '/api/register', [], [], [
+//            'CONTENT_TYPE' => 'application/json',
+//        ], json_encode([
+//            'email' => 'weakpass@test.com',
+//            'password' => 'abc',
+//            'confirmPassword' => 'abc',
+//            'firstname' => '',
+//            'lastname' => 'User',
+//            'phoneNumber' => '0600000000'
+//        ]));
+//
+//        $this->assertResponseStatusCodeSame(400);
+//
+//        $response3 = json_decode($client->getResponse()->getContent(), true);
+//        $this->assertArrayHasKey('errors', $response3);
+//        $this->assertStringContainsString(
+//            'Le champ \"Prénom\" ne peut pas être vide.',
+//            $response2['errors']
+//        );
     }
 }

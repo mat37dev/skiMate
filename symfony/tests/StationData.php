@@ -4,7 +4,7 @@ namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-class AccessDataStation extends WebTestCase
+class StationData extends WebTestCase
 {
     public function testStationReturnsSuccess(): void
     {

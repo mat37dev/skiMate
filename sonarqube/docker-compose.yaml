@@ -44,7 +44,7 @@ services:
             SONAR_HOST_URL: "http://sonarqubecicd:9000"
 
         volumes:
-            - ./symfony:/usr/src
+            - ../symfony:/usr/src
 volumes:
         sonarcicd_data:
         sonarcicd_extensions:

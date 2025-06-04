@@ -19,9 +19,6 @@
 # Fichiers générés par Composer et les vendor
 /symfony/vendor/
 
-# Migration et autres fichiers générés
-/symfony/migrations/
-
 # IDE / éditeurs
 /.idea/
 /.vscode/
@@ -40,3 +37,5 @@ docker-compose.override.yml
 /symfony/config/jwt/
 /.env
 /symfony/public/uploads/logos/
+# SonarQube
+/symfony/.scannerwork

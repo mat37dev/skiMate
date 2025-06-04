@@ -100,9 +100,9 @@ class AuthTest extends WebTestCase
             'email' => 'wrongmatch@test.com',
             'password' => 'MyPass123!',
             'confirmPassword' => 'NotTheSame123!',
-            'firstname' => 'Test',
-            'lastname' => 'User',
-            'phoneNumber' => '0600000000'
+            'firstName' => 'Test',
+            'lastName' => 'User',
+            'phoneNumber' => '0000000000'
         ]));
 
         $this->assertResponseStatusCodeSame(400);
@@ -118,9 +118,9 @@ class AuthTest extends WebTestCase
             'email' => 'weakpass@test.com',
             'password' => 'abc',
             'confirmPassword' => 'abc',
-            'firstname' => 'Test',
-            'lastname' => 'User',
-            'phoneNumber' => '0600000000'
+            'firstName' => 'Test',
+            'lastName' => 'User',
+            'phoneNumber' => '0000000000'
         ]));
 
         $this->assertResponseStatusCodeSame(400);
@@ -132,25 +132,29 @@ class AuthTest extends WebTestCase
             $response2['errors']
         );
 
-        // Cas 3 : avoir un champ vide
-//        $client->request('POST', '/api/register', [], [], [
-//            'CONTENT_TYPE' => 'application/json',
-//        ], json_encode([
-//            'email' => 'weakpass@test.com',
-//            'password' => 'abc',
-//            'confirmPassword' => 'abc',
-//            'firstname' => '',
-//            'lastname' => 'User',
-//            'phoneNumber' => '0600000000'
-//        ]));
-//
-//        $this->assertResponseStatusCodeSame(400);
-//
-//        $response3 = json_decode($client->getResponse()->getContent(), true);
-//        $this->assertArrayHasKey('errors', $response3);
-//        $this->assertStringContainsString(
-//            'Le champ \"Prénom\" ne peut pas être vide.',
-//            $response2['errors']
-//        );
+        // Cas 3 : champ prénom vide
+        $client->request('POST', '/api/register', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'email' => 'weakpass@test.com',
+            'password' => 'Abcdefghij123!',
+            'confirmPassword' => 'Abcdefghij123!',
+            'firstName' => '',
+            'lastName' => 'User',
+            'phoneNumber' => '0000000000'
+        ]));
+
+        $this->assertResponseStatusCodeSame(400);
+
+        $response3 = json_decode($client->getResponse()->getContent(), true);
+        $this->assertArrayHasKey('errors', $response3);
+        $this->assertArrayHasKey('firstname', $response3['errors']);
+
+        $this->assertStringContainsString(
+            'Le champ "Prénom" ne peut pas être vide.',
+            $response3['errors']['firstname']
+        );
+
+
     }
 }

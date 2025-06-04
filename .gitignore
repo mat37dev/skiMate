@@ -37,3 +37,6 @@ docker-compose.override.yml
 /symfony/config/jwt/
 /.env
 /symfony/public/uploads/logos/
+
+# SonarQube
+symfony/.scannerwork/

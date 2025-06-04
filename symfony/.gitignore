@@ -10,4 +10,4 @@
 ###< symfony/phpunit-bridge ###
 
 # SonarQube
-/.scannerwork/
+/.scannerwork

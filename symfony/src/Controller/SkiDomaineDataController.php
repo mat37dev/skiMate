@@ -71,6 +71,15 @@ class SkiDomaineDataController extends AbstractController
                     $station->setLongitude($long);
                     $station->setLatitude($lat);
 
+                    try {
+                        $hamlets = $domainDataFetcher->fetchHamletsForStation($stationName);
+                    } catch (\Exception $e) {
+                        // Si la requête échoue (timeout Overpass, etc.), on continue sans hamlets
+                        $hamlets = [];
+                    }
+                    // -> on suppose que l’entité Station a une méthode setCities() /par setHamlets()
+                    $station->setCity($hamlets);
+
                     // Mettre à jour la station avec ses features
                     $documentManager->persist($station);
                     $documentManager->flush();

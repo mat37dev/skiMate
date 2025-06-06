@@ -128,4 +128,57 @@ out skel qt;
 
 OVERPASS;
     }
+
+    /**
+     * Récupère les “hamlets” (villes ou quartiers) associés à une station.
+     *
+     * @param string $stationName Nom de la station (ex : "La Plagne")
+     * @return array Tableau de hameaux, chacun contenant ['id' => <osmId>, 'name' => <nom>, 'lat' => <latitude>, 'lon' => <longitude>]
+     * @throws Exception en cas d’échec de la requête Overpass
+     */
+    public function fetchHamletsForStation(string $stationName): array
+    {
+        // On construit la requête Overpass : on cherche tous les nodes "place=hamlet"
+        // dans l’aire correspondant à la station (way avec name="$stationName").
+        $query = <<<OVERPASS
+[out:json][timeout:25];
+area["name"="$stationName"]->.searchArea;
+node(area.searchArea)["place"="hamlet"];
+out body;
+>;
+out skel qt;
+OVERPASS;
+
+        $response = $this->httpClient->request('POST', $this->overpassUrl, [
+            'body'    => ['data' => $query],
+            'timeout' => 30,
+        ]);
+
+        if ($response->getStatusCode() !== 200) {
+            throw new Exception("Erreur lors de la récupération des hamlets pour la station '$stationName'");
+        }
+
+        $data = json_decode($response->getContent(), true);
+        $hamlets = [];
+
+        if (isset($data['elements']) && is_array($data['elements'])) {
+            foreach ($data['elements'] as $el) {
+                // On ne garde que les nodes avec un tag "name" (et présumément "place"="hamlet")
+                if ($el['type'] === 'node'
+                    && isset($el['tags']['name'])
+                    && isset($el['lat'], $el['lon'])
+                ) {
+                    $hamlets[] = [
+                        'id'   => (string) $el['id'],
+                        'name' => $el['tags']['name'],
+                        'lat'  => $el['lat'],
+                        'lon'  => $el['lon'],
+                    ];
+                }
+            }
+        }
+
+        return $hamlets;
+    }
 }
+

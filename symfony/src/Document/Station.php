@@ -30,6 +30,9 @@ class Station
     #[ODM\Field(type: "hash")]
     private array $tags = [];
 
+    #[ODM\Field(type: "hash")]
+    private array $city = [];
+
     // Booléen indiquant si la station a été validée par un admin
     #[ODM\Field(type: "bool")]
     private bool $validated = false;
@@ -297,6 +300,16 @@ class Station
     public function setLogo(string $logo): void
     {
         $this->logo = $logo;
+    }
+
+    public function getCity(): array
+    {
+        return $this->city;
+    }
+
+    public function setCity(array $city): void
+    {
+        $this->city = $city;
     }
 
 }

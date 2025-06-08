@@ -202,7 +202,8 @@ class SkiDomaineDataController extends AbstractController
                     'name' => $station->getName(),
                     'osmId' => $station->getOsmId(),
                     'tags' => $station->getTags(),
-                    'validated' => $station->isValidated()
+                    'validated' => $station->isValidated(),
+                    'city'=> $station->getCity(),
                 ]
             ];
 
@@ -259,6 +260,7 @@ class SkiDomaineDataController extends AbstractController
                 'name'  => $station->getName(),
                 'osmId' => $station->getOsmId(),
                 'logo'=> $station->getLogo(),
+                'domain'=> $station->getDomain(),
             ];
         }
 

@@ -20,7 +20,7 @@ services:
             - ./symfony/public/uploads:/var/www/symfony/public/uploads
             - ./.docker/php/php.ini:/usr/local/etc/php/conf.d/99-overrides.ini:ro
         ports:
-            - "8080:80"
+            - "8000:8000"
 
         environment:
             - MYSQL_HOST=mysql

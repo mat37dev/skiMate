@@ -296,7 +296,8 @@ class SkiDomaineDataController extends AbstractController
             'countIntermediate'=> $station->getCountIntermediate(),
             'countAdvanced'=> $station->getCountAdvanced(),
             'countExpert'=> $station->getCountExpert(),
-            'logo'=> $station->getLogo()
+            'logo'=> $station->getLogo(),
+            'city'=> $station->getCity(),  
         ];
         return $this->json($results, 200);
     }

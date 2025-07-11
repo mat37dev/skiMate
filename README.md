@@ -46,8 +46,9 @@ MONGODB_DB=skiMate
 - Importer les données avec une image temporaire officielle :
 
 ```powershell
-docker run --rm -v "$($env:USERPROFILE)\Downloads\stations2.json:/stations.json" mongo mongoimport --host host.docker.internal --port 27017 --username skimate --password skimate --authenticationDatabase admin --db skiMate --collection stations --file /stations.json --jsonArray
+docker run --rm -v "$($env:USERPROFILE)\PATH_TO_YOUR_DATA_FILE\stations.json:/stations.json" mongo mongoimport --host host.docker.internal --port 27017 --username skimate --password skimate --authenticationDatabase admin --db skiMate --collection stations --file /stations.json 
 ```
+
 
 ✅ Vous verrez un message comme : `3 document(s) imported successfully.`
 

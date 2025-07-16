@@ -2,6 +2,7 @@
 
 namespace App\Document;
 
+use DateTime;
 use Doctrine\ODM\MongoDB\Mapping\Annotations as ODM;
 
 #[ODM\Document(collection: 'WeatherForecast')]
@@ -14,7 +15,7 @@ class WeatherForecast
     private ?string $location = null;
 
     #[ODM\Field(type: 'date')]
-    private ?\DateTime $date = null;
+    private ?DateTime $date = null;
 
     #[ODM\Field(type: 'collection')]
     private array $forecasts = [];
@@ -35,12 +36,12 @@ class WeatherForecast
         return $this;
     }
 
-    public function getDate(): ?\DateTime
+    public function getDate(): ?DateTime
     {
         return $this->date;
     }
 
-    public function setDate(\DateTime $date): self
+    public function setDate(DateTime $date): self
     {
         $this->date = $date;
         return $this;

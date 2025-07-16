@@ -154,7 +154,5 @@ class AuthTest extends WebTestCase
             'Le champ "Prénom" ne peut pas être vide.',
             $response3['errors']['firstname']
         );
-
-
     }
 }

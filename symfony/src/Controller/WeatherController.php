@@ -5,6 +5,7 @@ use App\Document\Snowfall;
 use App\Document\WeatherForecast;
 use App\Service\WeatherApiService;
 use Doctrine\ODM\MongoDB\DocumentManager;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,7 +18,6 @@ class WeatherController extends AbstractController
     #[Route('/weather', name: 'app_weather', methods: ['POST'])]
     public function getSnow(Request $request, DocumentManager $documentManager): JsonResponse
     {
-        // Récupérer le body de la requête POST (attend un JSON contenant 'location')
         $data = json_decode($request->getContent(), true);
         $location = $data['location'] ?? null;
 
@@ -27,7 +27,6 @@ class WeatherController extends AbstractController
 
         $normalizedLocation = strtolower($location);
 
-        // Rechercher les données météo pour la location
         $weatherData = $documentManager->getRepository(WeatherForecast::class)->findOneBy(['location' => $normalizedLocation]);
 
         if (!$weatherData) {
@@ -35,13 +34,10 @@ class WeatherController extends AbstractController
         }
 
         $forecast = $weatherData->getForecasts();
-
-        // Rechercher les informations sur les dernières chutes de neige pour la location
         $lastSnowfallData = $documentManager->getRepository(Snowfall::class)->findOneBy(['location' => $normalizedLocation]);
         $forecast['0']['lastSnowfall'] = $lastSnowfallData ? $lastSnowfallData->getSnowfallAmount(): null;
         $forecast['0']['lastSnowFallDate'] = $lastSnowfallData ? $lastSnowfallData->getLastSnowfallDate(): null;
 
-        // Construire la réponse
         return $this->json([
             'location' => $weatherData->getLocation(),
             'date' => $weatherData->getDate(),
@@ -55,7 +51,7 @@ class WeatherController extends AbstractController
         try {
             $weatherApiService->saveWeeklyWeatherForAllLocations();
             return new JsonResponse(['message' => ['Météo mis à jour avec succès']], Response::HTTP_OK);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->json(['error' => "La mise à jour de la météo n'a pu être fait: ".$e->getMessage()], Response::HTTP_BAD_REQUEST);
         }
     }

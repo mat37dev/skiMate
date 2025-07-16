@@ -175,7 +175,6 @@ class SkiDomaineDataController extends AbstractController
         ]);
     }
 
-
     #[Route('/get-ski-domain', name: 'app_get_ski_domain', methods: ['POST'])]
     public function getSkiDomain(Request $request, DocumentManager $documentManager): JsonResponse
     {
@@ -261,6 +260,17 @@ class SkiDomaineDataController extends AbstractController
                 'osmId' => $station->getOsmId(),
                 'logo'=> $station->getLogo(),
                 'domain'=> $station->getDomain(),
+                'website' => $station->getWebsite(),
+                'emergencyPhone' => $station->getEmergencyPhone(),
+                'altitudeMin'=> $station->getAltitudeMin(),
+                'altitudeMax'=> $station->getAltitudeMax(),
+                'latitude'=> $station->getLatitude(),
+                'longitude'=> $station->getLongitude(),
+                'distanceSlope'=> $station->getDistanceSlope(),
+                'countEasy'=> $station->getCountEasy(),
+                'countIntermediate'=> $station->getCountIntermediate(),
+                'countAdvanced'=> $station->getCountAdvanced(),
+                'countExpert'=> $station->getCountExpert(),
             ];
         }
 

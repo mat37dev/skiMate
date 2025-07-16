@@ -5,6 +5,8 @@ namespace App\Service;
 use App\Document\Snowfall;
 use App\Document\Station;
 use App\Document\WeatherForecast;
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -41,7 +43,7 @@ class WeatherApiService
 
             try {
                 $this->saveWeeklyWeather($latitude, $longitude, $location);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logger->error("Échec de la mise à jour pour la station $location : {$e->getMessage()}");
             }
         }
@@ -67,14 +69,14 @@ class WeatherApiService
         // 3. Enregistrement des données
         $meteo = new WeatherForecast();
         $meteo->setLocation($location)
-            ->setDate(new \DateTime())
+            ->setDate(new DateTime())
             ->setForecasts($data);
 
         $this->documentManager->persist($meteo);
         $this->documentManager->flush();
 
         // 4. Mise à jour de la dernière chute de neige du jour
-        $today = (new \DateTime())->format('Y-m-d');
+        $today = (new DateTime())->format('Y-m-d');
         $todayForecast = array_filter($data, function ($forecast) use ($today) {
             return isset($forecast['day']) && $forecast['day'] === $today;
         });
@@ -125,7 +127,7 @@ class WeatherApiService
             throw new Exception('Aucune donnée horaire disponible.');
         }
 
-        $times       = array_map(fn($time) => new \DateTimeImmutable($time), $hourlyData['time']);
+        $times       = array_map(fn($time) => new DateTimeImmutable($time), $hourlyData['time']);
         $temperature = $hourlyData['temperature_2m'] ?? [];
         $snowfall    = $hourlyData['snowfall']       ?? [];
         $snowDepth   = $hourlyData['snow_depth']     ?? [];
@@ -292,7 +294,7 @@ class WeatherApiService
         $snowfallRepository = $this->documentManager->getRepository(Snowfall::class);
         $snowfall = $snowfallRepository->findOneBy(['location' => $location]);
 
-        $today = new \DateTime();
+        $today = new DateTime();
         $todaySnowfall = $dailyWeatherData['snowfall'];
 
         if ($todaySnowfall > 0) {

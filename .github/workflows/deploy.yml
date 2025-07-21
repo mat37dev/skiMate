@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Définis ces secrets dans Settings → Secrets de ton repo
-      SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      SONAR_HOST_URL: "http://localhost:9000"
       SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
     steps:
       - name: Checkout code

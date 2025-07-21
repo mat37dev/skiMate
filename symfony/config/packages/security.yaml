@@ -46,7 +46,7 @@ security:
     access_control:
         - { path: ^/api/admin, roles: ROLE_ADMIN }
         - { path: ^/api, roles: PUBLIC_ACCESS }
-        - { path: ^/api/comment/.*, roles: ROLE_ADMIN }
+        - { path: ^/api/comment/.*, roles: ROLE_USER }
 
 services:
     App\Security\JsonLoginSuccessHandler:

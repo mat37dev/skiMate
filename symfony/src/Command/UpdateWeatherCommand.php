@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Service\WeatherApiService;
+use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -34,7 +35,7 @@ class UpdateWeatherCommand extends Command
             $this->weatherApiService->saveWeeklyWeatherForAllLocations();
             $output->writeln('Mise à jour météo terminée avec succès.');
             return Command::SUCCESS;
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $output->writeln("Erreur lors de la mise à jour : {$e->getMessage()}");
             return Command::FAILURE;
         }

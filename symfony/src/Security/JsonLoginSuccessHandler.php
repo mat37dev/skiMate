@@ -6,6 +6,7 @@ use App\Entity\RefreshToken;
 use App\Repository\RefreshTokenRepository;
 use Gesdinet\JWTRefreshTokenBundle\Model\RefreshTokenManagerInterface;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Random\RandomException;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
@@ -25,6 +26,9 @@ class JsonLoginSuccessHandler implements AuthenticationSuccessHandlerInterface
         $this->refreshTokenRepository = $refreshTokenRepository;
     }
 
+    /**
+     * @throws RandomException
+     */
     public function onAuthenticationSuccess(Request $request, TokenInterface $token): JsonResponse
     {
         $user = $token->getUser();

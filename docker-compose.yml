@@ -9,7 +9,6 @@ services:
             - ./.docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
         networks:
             - network
-            - skimate_shared
     php_skimate:
         build:
             context: .
@@ -31,7 +30,6 @@ services:
             - JWT_PASSPHRASE=${JWT_PASSPHRASE}
         networks:
             - network
-            - skimate_shared
 
     mysql_skimate:
         image: mysql:8.4.5
@@ -46,7 +44,6 @@ services:
             - mysql_data:/var/lib/mysql
         networks:
             - network
-            - skimate_shared
 
     mongo_skimate:
         image: mongo:8.0
@@ -59,7 +56,6 @@ services:
             - mongo_data:/data/db
         networks:
             - network
-            - skimate_shared
 
 volumes:
     mysql_data:
@@ -68,5 +64,3 @@ volumes:
 networks:
     network:
         driver: bridge
-    skimate_shared:
-        external: true

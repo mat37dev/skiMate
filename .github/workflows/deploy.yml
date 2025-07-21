@@ -63,24 +63,22 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     env:
-      # Définis ces secrets dans Settings → Secrets de ton repo
-      SONAR_HOST_URL: "http://host.docker.internal:9000"
-      SONAR_TOKEN:    ${{ secrets.SONAR_TOKEN }}
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Run SonarScanner
+      # on rebuild uniquement le scanner
+      - name: Build scanner container
+        run: docker compose build sonar-scannercicd
+
+      - name: Run SonarQube analysis
         run: |
-          docker run --rm \
-            --network host \
-            -v "${{ github.workspace }}:/usr/src" \
-            -e SONAR_HOST_URL \
-            -e SONAR_TOKEN \
-            sonarsource/sonar-scanner-cli \
-            -Dsonar.projectKey=skimate \
-            -Dsonar.sources=src \
-            -Dsonar.tests=tests \
-            -Dsonar.php.coverage.reportPaths=coverage.xml \
-            -Dsonar.host.url=$SONAR_HOST_URL \
-            -Dsonar.login=$SONAR_TOKEN
+          docker compose run --rm sonar-scannercicd \
+            sonar-scanner \
+              -Dsonar.host.url=http://sonarqubecicd:9000 \
+              -Dsonar.login=${SONAR_TOKEN} \
+              -Dsonar.projectKey=skimate \
+              -Dsonar.sources=src \
+              -Dsonar.tests=tests \
+              -Dsonar.php.coverage.reportPaths=coverage.xml

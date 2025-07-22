@@ -63,6 +63,7 @@ jobs:
     needs: build-and-test
     runs-on: ubuntu-latest
     env:
+      SONAR_HOST_URL: "http://localhost:9001"
       SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
     steps:
       - name: Checkout code
@@ -70,15 +71,21 @@ jobs:
 
       # on rebuild uniquement le scanner
       - name: Build scanner container
-        run: docker compose build sonar-scannercicd
+        run: docker compose \
+          -f docker-compose.yml \
+          -f sonarqube/docker-compose.yml \
+          build sonar-scannercicd
 
       - name: Run SonarQube analysis
         run: |
-          docker compose run --rm sonar-scannercicd \
-            sonar-scanner \
-              -Dsonar.host.url=http://sonarqubecicd:9000 \
-              -Dsonar.login=${SONAR_TOKEN} \
-              -Dsonar.projectKey=skimate \
-              -Dsonar.sources=src \
-              -Dsonar.tests=tests \
-              -Dsonar.php.coverage.reportPaths=coverage.xml
+          docker compose \
+            -f docker-compose.yml \
+            -f sonarqube/docker-compose.yml \
+            run --rm sonar-scannercicd \
+              sonar-scanner \
+                -Dsonar.host.url=${SONAR_HOST_URL} \
+                -Dsonar.login=${SONAR_TOKEN} \
+                -Dsonar.projectKey=skimate \
+                -Dsonar.sources=src \
+                -Dsonar.tests=tests \
+                -Dsonar.php.coverage.reportPaths=coverage.xml

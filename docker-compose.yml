@@ -57,6 +57,23 @@ services:
         networks:
             - network
 
+    mongo_express:
+        image: mongo-express:latest
+        container_name: mongo_express
+        restart: always
+        ports:
+            - "8082:8081"
+        environment:
+            # connexion à MongoDB avec user/password
+            ME_CONFIG_MONGODB_URL: "mongodb://skimate:skimate@mongo_skimate:27017"
+            # activer l’authentification web
+            ME_CONFIG_BASICAUTH_USERNAME: skimate
+            ME_CONFIG_BASICAUTH_PASSWORD: skimate
+        depends_on:
+            - mongo_skimate
+        networks:
+            - network
+
 volumes:
     mysql_data:
     mongo_data:

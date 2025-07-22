@@ -78,7 +78,6 @@ class AuthTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('token', $data);
 
-        // décoder le JWT (sans vérifier la signature ici)
         $parts = explode('.', $data['token']);
         $payload = json_decode(base64_decode($parts[1]), true);
 

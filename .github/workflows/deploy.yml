@@ -74,14 +74,14 @@ jobs:
         run: docker compose \
           -f docker-compose.yml \
           -f sonarqube/docker-compose.yml \
-          build sonar-scannercicd
+          build scanner
 
       - name: Run SonarQube analysis
         run: |
           docker compose \
             -f docker-compose.yml \
             -f sonarqube/docker-compose.yml \
-            run --rm sonar-scannercicd \
+            run --rm scanner \
               sonar-scanner \
                 -Dsonar.host.url=${SONAR_HOST_URL} \
                 -Dsonar.login=${SONAR_TOKEN} \

@@ -1,0 +1,73 @@
+name: CD Pipeline – Back
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  deploy:
+    name: Deploy API (Docker Compose)
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU and Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push API image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ./.docker/php/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}/api:${{ github.sha }}
+
+      - name: SSH & Deploy via docker-compose
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /srv/skimate-back         # chemin sur ton serveur
+            # 5.1 Récupérer la nouvelle image
+            docker-compose pull php_skimate
+            # 5.2 Redémarrer tous les conteneurs
+            docker-compose up -d --remove-orphans
+            # 5.3 Exécuter les migrations Doctrine
+            docker-compose run --rm php_skimate \
+              php bin/console doctrine:migrations:migrate --no-interaction --env=prod
+            # 5.4 Health‑check basique
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:9000/api/health)
+            if [ "$STATUS" -ne 200 ]; then
+              echo "❌ Health check failed (HTTP $STATUS)"
+              exit 1
+            else
+              echo "✅ API is healthy"
+            fi
+
+      - name: Create Git tag
+        if: success()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "deploy-back-${{ github.sha }}" -m "Deploy API ${{ github.sha }}"
+          git push origin --tags
+
+      - name: Notify Slack on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          fields: repo,commit,message,author,workflow,job

@@ -10,6 +10,8 @@ use DateTimeImmutable;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WeatherApiService
@@ -102,6 +104,9 @@ class WeatherApiService
      * Appelle l'API Open-Meteo pour récupérer les données météo horaires
      * et retourne un tableau agrégé sur 7 jours, en incluant TOUTES les heures
      * (0h à 23h).
+     * @throws TransportExceptionInterface
+     * @throws Exception
+     * @throws DecodingExceptionInterface
      */
     public function getWeeklyWeather(float $latitude, float $longitude): array
     {
@@ -120,7 +125,6 @@ class WeatherApiService
         }
 
         $data = $response->toArray();
-        $this->logger->debug('Données brutes de la météo :', $data);
 
         $hourlyData = $data['hourly'] ?? [];
         if (empty($hourlyData)) {

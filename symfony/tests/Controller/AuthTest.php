@@ -154,4 +154,15 @@ class AuthTest extends WebTestCase
             $response3['errors']['firstname']
         );
     }
+
+    public function loginFakePassword(): void
+    {
+        $client = static::createClient();
+        $client->request('POST', '/api/login', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'email' => 'test@test.com',
+            'password' => 'MyPass123!',
+        ]));
+    }
 }

@@ -134,16 +134,11 @@ class WeatherApiService
         $weatherCode = $hourlyData['weather_code']   ?? [];
         $windSpeed   = $hourlyData['wind_speed_10m'] ?? [];
 
-        // Regrouper par jour, en morning et afternoon (mais SANS exclure le soir et la nuit)
-        // Si vous VOULEZ inclure toutes les heures, on peut choisir :
-        // - morning : 0h à 11h59
-        // - afternoon : 12h à 23h59
         $dailyData = [];
         foreach ($times as $index => $time) {
             $day = $time->format('Y-m-d');
             $hour = (int)$time->format('H');
 
-            // Initialiser la structure
             if (!isset($dailyData[$day])) {
                 $dailyData[$day] = [
                     'morning' => [],
@@ -151,8 +146,6 @@ class WeatherApiService
                 ];
             }
 
-            // Construction du dataPoint
-            // => On caste weather_code en int pour éviter problème
             $dataPoint = [
                 'temperature_2m' => $temperature[$index] ?? 0.0,
                 'snowfall'       => $snowfall[$index]    ?? 0.0,
@@ -161,7 +154,6 @@ class WeatherApiService
                 'wind_speed_10m' => $windSpeed[$index]   ?? 0.0,
             ];
 
-            // => morning = 0h–11h59, afternoon = 12h–23h59
             if ($hour < 12) {
                 $dailyData[$day]['morning'][] = $dataPoint;
             } else {
@@ -169,7 +161,6 @@ class WeatherApiService
             }
         }
 
-        // Préparer le tableau final (7 jours max)
         $weeklyData = [];
         foreach (array_slice($dailyData, 0, 7) as $day => $periods) {
             $weeklyData[] = [

@@ -78,7 +78,6 @@ class AuthTest extends WebTestCase
         $data = json_decode($client->getResponse()->getContent(), true);
         $this->assertArrayHasKey('token', $data);
 
-        // décoder le JWT (sans vérifier la signature ici)
         $parts = explode('.', $data['token']);
         $payload = json_decode(base64_decode($parts[1]), true);
 
@@ -154,7 +153,16 @@ class AuthTest extends WebTestCase
             'Le champ "Prénom" ne peut pas être vide.',
             $response3['errors']['firstname']
         );
+    }
 
-
+    public function loginFakePassword(): void
+    {
+        $client = static::createClient();
+        $client->request('POST', '/api/login', [], [], [
+            'CONTENT_TYPE' => 'application/json',
+        ], json_encode([
+            'email' => 'test@test.com',
+            'password' => 'MyPass123!',
+        ]));
     }
 }

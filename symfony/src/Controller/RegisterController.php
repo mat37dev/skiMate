@@ -1,7 +1,6 @@
 <?php
 namespace App\Controller;
 
-
 use App\Entity\Users;
 use App\Repository\RolesRepository;
 use App\Repository\UsersRepository;
@@ -17,7 +16,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class RegisterController extends AbstractController
 {
     #[Route('/register', name: 'api_register', methods: ['POST'])]
-    public function index(Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator, UsersRepository $usersRepository, RolesRepository $rolesRepository): JsonResponse
+    public function index(Request $request, UserPasswordHasherInterface $passwordHasher, ValidatorInterface $validator,
+                          UsersRepository $usersRepository, RolesRepository $rolesRepository): JsonResponse
     {
 
         $data = json_decode($request->getContent(), true);

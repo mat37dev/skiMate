@@ -5,9 +5,13 @@ namespace App\Service;
 use App\Document\Snowfall;
 use App\Document\Station;
 use App\Document\WeatherForecast;
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\ODM\MongoDB\DocumentManager;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Symfony\Contracts\HttpClient\Exception\DecodingExceptionInterface;
+use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class WeatherApiService
@@ -41,7 +45,7 @@ class WeatherApiService
 
             try {
                 $this->saveWeeklyWeather($latitude, $longitude, $location);
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $this->logger->error("Échec de la mise à jour pour la station $location : {$e->getMessage()}");
             }
         }
@@ -67,14 +71,14 @@ class WeatherApiService
         // 3. Enregistrement des données
         $meteo = new WeatherForecast();
         $meteo->setLocation($location)
-            ->setDate(new \DateTime())
+            ->setDate(new DateTime())
             ->setForecasts($data);
 
         $this->documentManager->persist($meteo);
         $this->documentManager->flush();
 
         // 4. Mise à jour de la dernière chute de neige du jour
-        $today = (new \DateTime())->format('Y-m-d');
+        $today = (new DateTime())->format('Y-m-d');
         $todayForecast = array_filter($data, function ($forecast) use ($today) {
             return isset($forecast['day']) && $forecast['day'] === $today;
         });
@@ -100,6 +104,9 @@ class WeatherApiService
      * Appelle l'API Open-Meteo pour récupérer les données météo horaires
      * et retourne un tableau agrégé sur 7 jours, en incluant TOUTES les heures
      * (0h à 23h).
+     * @throws TransportExceptionInterface
+     * @throws Exception
+     * @throws DecodingExceptionInterface
      */
     public function getWeeklyWeather(float $latitude, float $longitude): array
     {
@@ -118,30 +125,24 @@ class WeatherApiService
         }
 
         $data = $response->toArray();
-        $this->logger->debug('Données brutes de la météo :', $data);
 
         $hourlyData = $data['hourly'] ?? [];
         if (empty($hourlyData)) {
             throw new Exception('Aucune donnée horaire disponible.');
         }
 
-        $times       = array_map(fn($time) => new \DateTimeImmutable($time), $hourlyData['time']);
+        $times       = array_map(fn($time) => new DateTimeImmutable($time), $hourlyData['time']);
         $temperature = $hourlyData['temperature_2m'] ?? [];
         $snowfall    = $hourlyData['snowfall']       ?? [];
         $snowDepth   = $hourlyData['snow_depth']     ?? [];
         $weatherCode = $hourlyData['weather_code']   ?? [];
         $windSpeed   = $hourlyData['wind_speed_10m'] ?? [];
 
-        // Regrouper par jour, en morning et afternoon (mais SANS exclure le soir et la nuit)
-        // Si vous VOULEZ inclure toutes les heures, on peut choisir :
-        // - morning : 0h à 11h59
-        // - afternoon : 12h à 23h59
         $dailyData = [];
         foreach ($times as $index => $time) {
             $day = $time->format('Y-m-d');
             $hour = (int)$time->format('H');
 
-            // Initialiser la structure
             if (!isset($dailyData[$day])) {
                 $dailyData[$day] = [
                     'morning' => [],
@@ -149,8 +150,6 @@ class WeatherApiService
                 ];
             }
 
-            // Construction du dataPoint
-            // => On caste weather_code en int pour éviter problème
             $dataPoint = [
                 'temperature_2m' => $temperature[$index] ?? 0.0,
                 'snowfall'       => $snowfall[$index]    ?? 0.0,
@@ -159,7 +158,6 @@ class WeatherApiService
                 'wind_speed_10m' => $windSpeed[$index]   ?? 0.0,
             ];
 
-            // => morning = 0h–11h59, afternoon = 12h–23h59
             if ($hour < 12) {
                 $dailyData[$day]['morning'][] = $dataPoint;
             } else {
@@ -167,7 +165,6 @@ class WeatherApiService
             }
         }
 
-        // Préparer le tableau final (7 jours max)
         $weeklyData = [];
         foreach (array_slice($dailyData, 0, 7) as $day => $periods) {
             $weeklyData[] = [
@@ -292,7 +289,7 @@ class WeatherApiService
         $snowfallRepository = $this->documentManager->getRepository(Snowfall::class);
         $snowfall = $snowfallRepository->findOneBy(['location' => $location]);
 
-        $today = new \DateTime();
+        $today = new DateTime();
         $todaySnowfall = $dailyWeatherData['snowfall'];
 
         if ($todaySnowfall > 0) {

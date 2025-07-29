@@ -147,7 +147,7 @@ class SkiDomainDataTransformer
         return ['type' => 'GeometryCollection', 'coordinates' => []];
     }
 
-    private function calculateOrientation(array $geometry): string
+    public function calculateOrientation(array $geometry): string
     {
         set_time_limit(300);
         // Vérifier que la géométrie est de type LineString et possède au moins deux points

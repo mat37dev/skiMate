@@ -2,7 +2,7 @@
 
 ## Installation
 
-Ce projet utilise Docker pour lancer l’environnement backend, incluant PHP (Symfony), MongoDB, PostgreSQL (branche `dev`), PhpMyAdmin et Mongo Express.
+Ce projet utilise Docker pour lancer l’environnement backend, incluant PHP (Symfony), MongoDB, MySQL (branche `dev`), PhpMyAdmin et Mongo Express.
 
 ### Prérequis
 
@@ -78,7 +78,7 @@ php bin/console doctrine:migrations:migrate
 - **PhpMyAdmin** → http://localhost:8081
 - **Mongo Express** → http://localhost:8082
 - **MongoDB** → port 27017
-- **PostgreSQL / MySQL** → selon config du docker-compose
+- **MySQL** → selon config du docker-compose
 
 ---
 

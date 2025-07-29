@@ -28,30 +28,21 @@ class UsersRepository extends ServiceEntityRepository
 
     public function searchUsers(?string $search, ?string $role): array
     {
-        // Créez un QueryBuilder sur l'entité Users
         $qb = $this->createQueryBuilder('u');
-
-        // Joindre le rôle si un filtre sur role est demandé
         if ($role) {
-            // On fait un JOIN sur la relation ManyToMany "roles"
             $qb->leftJoin('u.roles', 'r')
                 ->andWhere('r.name = :role')
                 ->setParameter('role', $role);
         }
-
-        // Gérer le champ de recherche
         if ($search) {
             $searchLike = '%'.$search.'%';
             $qb->andWhere(
                 $qb->expr()->orX(
-                // email
                     $qb->expr()->like('u.email', ':search'),
-                    // firstname + lastname dans un sens
                     $qb->expr()->like(
                         "CONCAT(u.firstname, ' ', u.lastname)",
                         ':search'
                     ),
-                    // lastname + firstname dans l'autre sens
                     $qb->expr()->like(
                         "CONCAT(u.lastname, ' ', u.firstname)",
                         ':search'
@@ -60,8 +51,6 @@ class UsersRepository extends ServiceEntityRepository
             )->setParameter('search', $searchLike);
         }
         $qb->distinct();
-
-        // Exécuter la requête
         return $qb->getQuery()->getResult();
     }
 }
